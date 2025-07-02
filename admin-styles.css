@@ -1,0 +1,485 @@
+/* Admin Panel Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --admin-primary: #2c3e50;
+    --admin-secondary: #3498db;
+    --admin-success: #27ae60;
+    --admin-warning: #f39c12;
+    --admin-danger: #e74c3c;
+    --admin-light: #ecf0f1;
+    --admin-dark: #34495e;
+    --admin-border: #bdc3c7;
+    --admin-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    --admin-radius: 8px;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--admin-light);
+    color: var(--admin-primary);
+    line-height: 1.6;
+}
+
+.admin-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.admin-header {
+    background: white;
+    box-shadow: var(--admin-shadow);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.admin-header h1 {
+    color: var(--admin-primary);
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.admin-header h1 i {
+    color: #ff69b4;
+    margin-right: 0.5rem;
+}
+
+.header-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+/* Navigation Tabs */
+.admin-nav {
+    background: var(--admin-primary);
+    padding: 0 2rem;
+    display: flex;
+    overflow-x: auto;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.nav-tab {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    border-bottom: 3px solid transparent;
+    font-weight: 500;
+}
+
+.nav-tab:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.nav-tab.active {
+    color: white;
+    border-bottom-color: var(--admin-secondary);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.nav-tab i {
+    margin-right: 0.5rem;
+}
+
+/* Main Content */
+.admin-main {
+    flex: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    width: 100%;
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.section-header {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.section-header h2 {
+    color: var(--admin-primary);
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.section-header h2 i {
+    color: #ff69b4;
+    margin-right: 0.5rem;
+}
+
+.section-header p {
+    color: #666;
+    font-size: 1.1rem;
+}
+
+/* Forms */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--admin-primary);
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    padding: 0.75rem;
+    border: 2px solid var(--admin-border);
+    border-radius: var(--admin-radius);
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+    font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--admin-secondary);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-group small {
+    margin-top: 0.5rem;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Buttons */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: var(--admin-radius);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.btn-preview {
+    background: var(--admin-secondary);
+    color: white;
+}
+
+.btn-preview:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+}
+
+.btn-save {
+    background: var(--admin-success);
+    color: white;
+}
+
+.btn-save:hover {
+    background: #229954;
+    transform: translateY(-2px);
+}
+
+.btn-add {
+    background: var(--admin-secondary);
+    color: white;
+    margin-bottom: 1.5rem;
+}
+
+.btn-add:hover {
+    background: #2980b9;
+}
+
+.btn-danger {
+    background: var(--admin-danger);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c0392b;
+}
+
+.btn-export {
+    background: var(--admin-warning);
+    color: white;
+}
+
+.btn-export:hover {
+    background: #d68910;
+}
+
+.btn-import {
+    background: var(--admin-dark);
+    color: white;
+}
+
+.btn-import:hover {
+    background: #2c3e50;
+}
+
+/* Gallery Admin */
+.gallery-admin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.gallery-admin-item {
+    background: white;
+    border-radius: var(--admin-radius);
+    padding: 1.5rem;
+    box-shadow: var(--admin-shadow);
+}
+
+.gallery-admin-item img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: var(--admin-radius);
+    margin-bottom: 1rem;
+}
+
+/* Timeline Admin */
+.timeline-admin-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.timeline-admin-item {
+    background: white;
+    border-radius: var(--admin-radius);
+    padding: 1.5rem;
+    box-shadow: var(--admin-shadow);
+    border-left: 4px solid #ff69b4;
+}
+
+/* Surprises Admin */
+.surprises-admin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+.surprise-admin-item {
+    background: white;
+    border-radius: var(--admin-radius);
+    padding: 1.5rem;
+    box-shadow: var(--admin-shadow);
+}
+
+.surprise-icon-picker {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.5rem;
+    margin: 0.5rem 0;
+}
+
+.icon-option {
+    padding: 0.5rem;
+    border: 2px solid var(--admin-border);
+    border-radius: var(--admin-radius);
+    text-align: center;
+    cursor: pointer;
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.icon-option:hover,
+.icon-option.selected {
+    border-color: var(--admin-secondary);
+    background: rgba(52, 152, 219, 0.1);
+}
+
+/* Quiz Admin */
+.quiz-admin-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.quiz-admin-item {
+    background: white;
+    border-radius: var(--admin-radius);
+    padding: 1.5rem;
+    box-shadow: var(--admin-shadow);
+}
+
+.quiz-options-admin {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 1rem 0;
+}
+
+.quiz-option-admin {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.quiz-option-admin input[type="text"] {
+    flex: 1;
+}
+
+.quiz-option-admin input[type="radio"] {
+    margin: 0;
+}
+
+/* Preview Box */
+.preview-box {
+    background: white;
+    border-radius: var(--admin-radius);
+    padding: 1.5rem;
+    box-shadow: var(--admin-shadow);
+    margin-top: 1.5rem;
+}
+
+.preview-box h3 {
+    margin-bottom: 1rem;
+    color: var(--admin-primary);
+}
+
+.message-preview {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: var(--admin-radius);
+    border-left: 4px solid #ff69b4;
+    white-space: pre-line;
+    font-style: italic;
+    line-height: 1.8;
+}
+
+/* Status Messages */
+.status-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 1rem 1.5rem;
+    border-radius: var(--admin-radius);
+    color: white;
+    font-weight: 600;
+    transform: translateX(400px);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+}
+
+.status-message.show {
+    transform: translateX(0);
+}
+
+.status-message.success {
+    background: var(--admin-success);
+}
+
+.status-message.error {
+    background: var(--admin-danger);
+}
+
+.status-message.warning {
+    background: var(--admin-warning);
+}
+
+/* Settings */
+.settings-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    justify-content: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .header-actions {
+        justify-content: center;
+    }
+
+    .admin-nav {
+        padding: 0 1rem;
+    }
+
+    .admin-main {
+        padding: 1rem;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .gallery-admin-grid,
+    .surprises-admin-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .settings-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

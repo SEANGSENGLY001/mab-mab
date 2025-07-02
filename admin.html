@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Website - Admin Control Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="admin-styles.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Header -->
+        <header class="admin-header">
+            <div class="header-content">
+                <h1><i class="fas fa-heart"></i> Birthday Website Control Panel</h1>
+                <div class="header-actions">
+                    <button class="btn btn-preview" onclick="previewWebsite()">
+                        <i class="fas fa-eye"></i> Preview Website
+                    </button>
+                    <button class="btn btn-save" onclick="saveAllData()">
+                        <i class="fas fa-save"></i> Save All Changes
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="admin-nav">
+            <button class="nav-tab active" onclick="showTab('personal')">
+                <i class="fas fa-user-heart"></i> Personal Info
+            </button>
+            <button class="nav-tab" onclick="showTab('message')">
+                <i class="fas fa-envelope-heart"></i> Love Message
+            </button>
+            <button class="nav-tab" onclick="showTab('gallery')">
+                <i class="fas fa-images"></i> Photo Gallery
+            </button>
+            <button class="nav-tab" onclick="showTab('timeline')">
+                <i class="fas fa-timeline"></i> Our Story
+            </button>
+            <button class="nav-tab" onclick="showTab('surprises')">
+                <i class="fas fa-gift"></i> Surprises
+            </button>
+            <button class="nav-tab" onclick="showTab('quiz')">
+                <i class="fas fa-question-circle"></i> Quiz
+            </button>
+            <button class="nav-tab" onclick="showTab('settings')">
+                <i class="fas fa-cog"></i> Settings
+            </button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- Personal Information Tab -->
+            <div id="personal-tab" class="tab-content active">
+                <div class="section-header">
+                    <h2><i class="fas fa-user-heart"></i> Personal Information</h2>
+                    <p>Update the basic details about you and your girlfriend</p>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="girlfriend-name">Her Name</label>
+                        <input type="text" id="girlfriend-name" placeholder="Enter her name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="your-name">Your Name/Signature</label>
+                        <input type="text" id="your-name" placeholder="How you want to sign the messages">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="relationship-start">When You Started Dating</label>
+                        <input type="date" id="relationship-start">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="special-date">Special Event Date (Birthday/Anniversary)</label>
+                        <input type="date" id="special-date">
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label for="website-title">Website Title</label>
+                        <input type="text" id="website-title" placeholder="Happy Birthday, Beautiful! 💕">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Love Message Tab -->
+            <div id="message-tab" class="tab-content">
+                <div class="section-header">
+                    <h2><i class="fas fa-envelope-heart"></i> Personal Love Message</h2>
+                    <p>Write a heartfelt message that will appear on the website</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="message-title">Message Section Title</label>
+                    <input type="text" id="message-title" placeholder="A Message From My Heart">
+                </div>
+                
+                <div class="form-group">
+                    <label for="message-content">Your Love Message</label>
+                    <textarea id="message-content" rows="12" placeholder="Write your heartfelt message here..."></textarea>
+                    <small>Tip: Use line breaks to separate paragraphs. You can use emojis too! 💕</small>
+                </div>
+                
+                <div class="preview-box">
+                    <h3>Preview:</h3>
+                    <div id="message-preview" class="message-preview"></div>
+                </div>
+            </div>
+
+            <!-- Photo Gallery Tab -->
+            <div id="gallery-tab" class="tab-content">
+                <div class="section-header">
+                    <h2><i class="fas fa-images"></i> Photo Gallery</h2>
+                    <p>Add your favorite photos and memories</p>
+                </div>
+                
+                <div class="gallery-controls">
+                    <button class="btn btn-add" onclick="addGalleryItem()">
+                        <i class="fas fa-plus"></i> Add New Photo
+                    </button>
+                </div>
+                
+                <div id="gallery-items" class="gallery-admin-grid">
+                    <!-- Gallery items will be populated here -->
+                </div>
+            </div>
+
+            <!-- Timeline Tab -->
+            <div id="timeline-tab" class="tab-content">
+                <div class="section-header">
+                    <h2><i class="fas fa-timeline"></i> Your Love Story Timeline</h2>
+                    <p>Add important milestones in your relationship</p>
+                </div>
+                
+                <div class="timeline-controls">
+                    <button class="btn btn-add" onclick="addTimelineItem()">
+                        <i class="fas fa-plus"></i> Add New Milestone
+                    </button>
+                </div>
+                
+                <div id="timeline-items" class="timeline-admin-list">
+                    <!-- Timeline items will be populated here -->
+                </div>
+            </div>
+
+            <!-- Surprises Tab -->
+            <div id="surprises-tab" class="tab-content">
+                <div class="section-header">
+                    <h2><i class="fas fa-gift"></i> Digital Surprises</h2>
+                    <p>Create surprise cards that she can click to reveal</p>
+                </div>
+                
+                <div class="surprises-controls">
+                    <button class="btn btn-add" onclick="addSurpriseItem()">
+                        <i class="fas fa-plus"></i> Add New Surprise
+                    </button>
+                </div>
+                
+                <div id="surprise-items" class="surprises-admin-grid">
+                    <!-- Surprise items will be populated here -->
+                </div>
+            </div>
+
+            <!-- Quiz Tab -->
+            <div id="quiz-tab" class="tab-content">
+                <div class="section-header">
+                    <h2><i class="fas fa-question-circle"></i> Relationship Quiz</h2>
+                    <p>Create fun questions about your relationship</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="quiz-title">Quiz Title</label>
+                    <input type="text" id="quiz-title" placeholder="How Well Do You Know Us?">
+                </div>
+                
+                <div class="form-group">
+                    <label for="quiz-subtitle">Quiz Subtitle</label>
+                    <input type="text" id="quiz-subtitle" placeholder="A fun little quiz about our relationship">
+                </div>
+                
+                <div class="quiz-controls">
+                    <button class="btn btn-add" onclick="addQuizQuestion()">
+                        <i class="fas fa-plus"></i> Add New Question
+                    </button>
+                </div>
+                
+                <div id="quiz-questions" class="quiz-admin-list">
+                    <!-- Quiz questions will be populated here -->
+                </div>
+                
+                <div class="form-group">
+                    <label for="completion-title">Completion Message Title</label>
+                    <input type="text" id="completion-title" placeholder="You know us so well!">
+                </div>
+                
+                <div class="form-group">
+                    <label for="completion-message">Completion Message</label>
+                    <textarea id="completion-message" rows="3" placeholder="Thank you for being amazing..."></textarea>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settings-tab" class="tab-content">
+                <div class="section-header">
+                    <h2><i class="fas fa-cog"></i> Website Settings</h2>
+                    <p>Customize colors and other website settings</p>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="primary-color">Primary Color (Pink)</label>
+                        <input type="color" id="primary-color" value="#ff69b4">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="secondary-color">Secondary Color (Dark Pink)</label>
+                        <input type="color" id="secondary-color" value="#ff1493">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="accent-color">Accent Color (Gold)</label>
+                        <input type="color" id="accent-color" value="#ffd700">
+                    </div>
+                </div>
+                
+                <div class="settings-actions">
+                    <button class="btn btn-export" onclick="exportData()">
+                        <i class="fas fa-download"></i> Export All Data
+                    </button>
+                    <button class="btn btn-import" onclick="document.getElementById('import-file').click()">
+                        <i class="fas fa-upload"></i> Import Data
+                    </button>
+                    <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importData(event)">
+                </div>
+            </div>
+        </main>
+
+        <!-- Status Messages -->
+        <div id="status-message" class="status-message"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="data.js"></script>
+    <script src="admin-script.js"></script>
+</body>
+</html>

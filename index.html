@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Happy Birthday, Beautiful! 💕</title>
+    <meta name="description" content="A special birthday surprise website">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Data Configuration -->
+    <script src="data.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">💕 Birthday Surprise</div>
+            <ul class="nav-menu">
+                <li><a href="#hero">Home</a></li>
+                <li><a href="#message">Message</a></li>
+                <li><a href="#gallery">Memories</a></li>
+                <li><a href="#timeline">Our Story</a></li>
+                <li><a href="#countdown">Countdown</a></li>
+                <li><a href="#surprises">Surprises</a></li>
+                <li><a href="#quiz">Quiz</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero" class="hero">
+        <div class="hero-background">
+            <div class="floating-hearts"></div>
+            <div class="confetti-container"></div>
+        </div>
+        <div class="hero-content">
+            <h1 class="hero-title">
+                <span class="greeting" id="hero-greeting">Happy Birthday</span>
+                <span class="name" id="hero-name">Beautiful!</span>
+            </h1>
+            <p class="hero-subtitle" id="hero-subtitle">Today is all about celebrating the most amazing person in my life</p>
+            <div class="hero-buttons">
+                <button class="btn btn-primary" onclick="startSurprise()">
+                    <i class="fas fa-gift"></i> <span id="hero-btn-primary">Start the Surprise</span>
+                </button>
+                <button class="btn btn-secondary" onclick="scrollToMessage()">
+                    <i class="fas fa-heart"></i> <span id="hero-btn-secondary">Read My Message</span>
+                </button>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <i class="fas fa-chevron-down"></i>
+        </div>
+    </section>
+
+    <!-- Personal Message Section -->
+    <section id="message" class="message-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 id="message-title">A Message From My Heart</h2>
+                <div class="heart-divider">💕</div>
+            </div>
+            <div class="message-content">
+                <div class="message-card">
+                    <p class="message-text" id="message-content">
+                        My dearest love,<br><br>
+
+                        Today marks another year of your incredible journey, and I feel so blessed to be part of it.
+                        You bring light to every room you enter, joy to every moment we share, and love to every corner of my heart.
+                        <br><br>
+
+                        This website is my small way of celebrating you and all the beautiful memories we've created together.
+                        Every photo, every moment, every surprise here represents just a fraction of how much you mean to me.
+                        <br><br>
+
+                        Happy Birthday, my love. Here's to many more adventures together! 💕
+                        <br><br>
+
+                        With all my love,<br>
+                        <em>Your devoted partner</em>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Photo Gallery Section -->
+    <section id="gallery" class="gallery-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Our Beautiful Memories</h2>
+                <p>Every picture tells a story of our love</p>
+            </div>
+            <div class="gallery-grid">
+                <!-- Photos will be dynamically loaded from data.js -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Timeline Section -->
+    <section id="timeline" class="timeline-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Our Love Story Timeline</h2>
+                <p>The journey of us</p>
+            </div>
+            <div class="timeline">
+                <!-- Timeline items will be added here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Countdown Section -->
+    <section id="countdown" class="countdown-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 id="countdown-title">Countdown to Something Special</h2>
+                <p id="countdown-subtitle">The excitement is building...</p>
+            </div>
+            <div class="countdown-timer">
+                <div class="time-unit">
+                    <span class="time-number" id="days">00</span>
+                    <span class="time-label">Days</span>
+                </div>
+                <div class="time-unit">
+                    <span class="time-number" id="hours">00</span>
+                    <span class="time-label">Hours</span>
+                </div>
+                <div class="time-unit">
+                    <span class="time-number" id="minutes">00</span>
+                    <span class="time-label">Minutes</span>
+                </div>
+                <div class="time-unit">
+                    <span class="time-number" id="seconds">00</span>
+                    <span class="time-label">Seconds</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Surprises Section -->
+    <section id="surprises" class="surprises-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Digital Surprises</h2>
+                <p>Click each gift to reveal your surprises!</p>
+            </div>
+            <div class="surprises-grid">
+                <!-- Surprise cards will be added here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Quiz Section -->
+    <section id="quiz" class="quiz-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 id="quiz-title-display">How Well Do You Know Us?</h2>
+                <p id="quiz-subtitle-display">A fun little quiz about our relationship</p>
+            </div>
+            <div class="quiz-container">
+                <!-- Quiz will be added here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Made with 💕 for the most amazing person in the world</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+</body>
+</html>
