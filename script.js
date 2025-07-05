@@ -744,14 +744,12 @@ function setupScrollAnimations() {
     setupHeroScrollParallax();
 }
 
-// Hero section scroll parallax effect
+// Hero section scroll parallax effect with smooth interpolation
 function setupHeroScrollParallax() {
     const hero = document.querySelector('.hero');
-    const heroContent = document.querySelector('.hero-content');
-    const heroBackground = document.querySelector('.hero-background');
     const scrollIndicator = document.querySelector('.scroll-indicator');
     
-    if (!hero || !heroContent || !heroBackground) return;
+    if (!hero) return;
     
     // Add click event to scroll indicator
     if (scrollIndicator) {
@@ -766,71 +764,77 @@ function setupHeroScrollParallax() {
         });
     }
     
-    let ticking = false;
+    let currentProgress = 0;
+    let targetProgress = 0;
+    let animationFrameId = null;
+    
+    function lerp(start, end, factor) {
+        return start + (end - start) * factor;
+    }
     
     function updateParallax() {
         const scrolled = window.pageYOffset;
         const heroHeight = hero.offsetHeight;
-        const scrollPercent = Math.min(scrolled / heroHeight, 1);
+        targetProgress = Math.min(scrolled / heroHeight, 1);
         
-        // Fade out scroll indicator as user scrolls
+        // Smoothly interpolate the scroll progress
+        if (!animationFrameId) {
+            animationFrameId = requestAnimationFrame(animate);
+        }
+    }
+    
+    function animate() {
+        // Smooth interpolation between current and target progress
+        currentProgress = lerp(currentProgress, targetProgress, 0.1);
+        
+        // Update CSS custom property for smooth transitions
+        hero.style.setProperty('--scroll-progress', currentProgress);
+        
+        // Add/remove scrolled class based on progress
+        if (currentProgress > 0) {
+            hero.classList.add('scrolled');
+        } else {
+            hero.classList.remove('scrolled');
+        }
+        
+        // Update scroll indicator visibility
         if (scrollIndicator) {
-            if (scrollPercent > 0.1) {
+            if (currentProgress > 0.1) {
                 scrollIndicator.classList.add('fade-out');
             } else {
                 scrollIndicator.classList.remove('fade-out');
             }
         }
         
-        // Apply parallax transforms with smooth easing
-        if (scrollPercent > 0) {
-            // Add scrolled class for CSS transitions
-            hero.classList.add('scrolled');
-            
-            // Parallax effect for hero content (moves slower)
-            const contentTransform = scrollPercent * -30;
-            const contentScale = 1 - (scrollPercent * 0.05);
-            const contentOpacity = 1 - (scrollPercent * 0.3);
-            
-            heroContent.style.transform = `translate3d(0, ${contentTransform}px, 0) scale(${contentScale})`;
-            heroContent.style.opacity = contentOpacity;
-            
-            // Parallax effect for background (moves faster)
-            const backgroundTransform = scrollPercent * 20;
-            const backgroundScale = 1 + (scrollPercent * 0.1);
-            
-            heroBackground.style.transform = `translate3d(0, ${backgroundTransform}px, 0) scale(${backgroundScale})`;
-            
-            // Add subtle rotation to the hero section
-            const heroRotation = scrollPercent * 1;
-            hero.style.transform = `translate3d(0, 0, 0) rotateX(${heroRotation}deg) scale(${1 + scrollPercent * 0.02})`;
+        // Continue animation if not close enough to target
+        if (Math.abs(currentProgress - targetProgress) > 0.001) {
+            animationFrameId = requestAnimationFrame(animate);
         } else {
-            hero.classList.remove('scrolled');
-            
-            // Reset transforms when at top
-            heroContent.style.transform = 'translate3d(0, 0, 0) scale(1)';
-            heroContent.style.opacity = '1';
-            heroBackground.style.transform = 'translate3d(0, 0, 0) scale(1)';
-            hero.style.transform = 'translate3d(0, 0, 0) rotateX(0deg) scale(1)';
-        }
-        
-        ticking = false;
-    }
-    
-    function requestParallaxUpdate() {
-        if (!ticking) {
-            requestAnimationFrame(updateParallax);
-            ticking = true;
+            animationFrameId = null;
         }
     }
     
     // Throttled scroll event listener for better performance
-    window.addEventListener('scroll', requestParallaxUpdate, { passive: true });
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            requestAnimationFrame(() => {
+                updateParallax();
+                ticking = false;
+            });
+            ticking = true;
+        }
+    }, { passive: true });
     
-    // Update on resize
+    // Update on resize with debouncing
+    let resizeTimeout;
     window.addEventListener('resize', () => {
-        requestAnimationFrame(updateParallax);
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(updateParallax, 100);
     });
+    
+    // Initial update
+    updateParallax();
 }
 
 // Add CSS animations dynamically

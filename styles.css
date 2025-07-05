@@ -167,22 +167,29 @@ body::-webkit-scrollbar {
     /* Performance optimizations */
     will-change: transform;
     transform: translateZ(0);
+    /* Custom property for scroll progress */
+    --scroll-progress: 0;
     /* Smooth scrolling interaction */
-    transition: transform 0.1s ease-out;
+    transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
 /* Scroll-based parallax effects */
 .hero.scrolled {
-    transform: translate3d(0, 0, 0) scale(1.02);
+    transform: translate3d(0, 0, 0) 
+               scale(calc(1 + var(--scroll-progress) * 0.015)) 
+               perspective(1000px)
+               rotateX(calc(var(--scroll-progress) * 0.8deg));
 }
 
 .hero.scrolled .hero-content {
-    transform: translate3d(0, -20px, 0) scale(0.98);
-    opacity: 0.8;
+    transform: translate3d(0, calc(var(--scroll-progress) * -15px), 0)
+               scale(calc(1 - var(--scroll-progress) * 0.02));
+    opacity: calc(1 - var(--scroll-progress) * 0.2);
 }
 
 .hero.scrolled .hero-background {
-    transform: translate3d(0, 10px, 0) scale(1.05);
+    transform: translate3d(0, calc(var(--scroll-progress) * 8px), 0)
+               scale(calc(1 + var(--scroll-progress) * 0.03));
 }
 
 .hero-background {
