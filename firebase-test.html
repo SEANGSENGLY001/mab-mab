@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Connection Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        .test-data {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔥 Firebase Realtime Database Connection Test</h1>
+        <p>This page tests the connection to your Firebase Realtime Database.</p>
+        
+        <div id="status-container"></div>
+        
+        <div class="test-controls">
+            <button onclick="testConnection()">Test Connection</button>
+            <button onclick="testWrite()">Test Write Data</button>
+            <button onclick="testRead()">Test Read Data</button>
+            <button onclick="clearLogs()">Clear Logs</button>
+        </div>
+        
+        <h3>Database URL:</h3>
+        <p><code>https://heng-thida-db-default-rtdb.firebaseio.com/</code></p>
+        
+        <h3>Test Data:</h3>
+        <div id="test-data" class="test-data">No data loaded yet...</div>
+        
+        <h3>Connection Details:</h3>
+        <ul>
+            <li><strong>Project ID:</strong> heng-thida-db</li>
+            <li><strong>Database Region:</strong> Default (us-central1)</li>
+            <li><strong>Database Type:</strong> Realtime Database</li>
+        </ul>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAr1jsAaqTk1ZlffhQ85pLLCj34ZXqt2s4",
+            authDomain: "heng-thida-db.firebaseapp.com",
+            databaseURL: "https://heng-thida-db-default-rtdb.firebaseio.com/",
+            projectId: "heng-thida-db",
+            storageBucket: "heng-thida-db.firebasestorage.app",
+            messagingSenderId: "850113003119",
+            appId: "1:850113003119:web:d6f64500987bf0b076979a"
+        };
+
+        let database;
+        
+        function addStatus(message, type = 'info') {
+            const container = document.getElementById('status-container');
+            const statusDiv = document.createElement('div');
+            statusDiv.className = `status ${type}`;
+            statusDiv.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+            container.appendChild(statusDiv);
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        function clearLogs() {
+            document.getElementById('status-container').innerHTML = '';
+            document.getElementById('test-data').textContent = 'No data loaded yet...';
+        }
+
+        async function testConnection() {
+            try {
+                addStatus('Testing Firebase connection...', 'info');
+                
+                // Initialize Firebase
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+                
+                database = firebase.database();
+                addStatus('Firebase initialized successfully!', 'success');
+                
+                // Test basic connection
+                const connectedRef = database.ref('.info/connected');
+                connectedRef.on('value', (snapshot) => {
+                    if (snapshot.val() === true) {
+                        addStatus('✅ Connected to Firebase Realtime Database!', 'success');
+                    } else {
+                        addStatus('❌ Disconnected from Firebase Realtime Database', 'error');
+                    }
+                });
+                
+            } catch (error) {
+                addStatus(`❌ Connection failed: ${error.message}`, 'error');
+                console.error('Firebase connection error:', error);
+            }
+        }
+
+        async function testWrite() {
+            try {
+                if (!database) {
+                    await testConnection();
+                }
+                
+                addStatus('Testing write operation...', 'info');
+                
+                const testData = {
+                    timestamp: new Date().toISOString(),
+                    message: 'Hello from Firebase test!',
+                    test: true,
+                    random: Math.random()
+                };
+                
+                await database.ref('test/connection').set(testData);
+                addStatus('✅ Write operation successful!', 'success');
+                
+            } catch (error) {
+                addStatus(`❌ Write failed: ${error.message}`, 'error');
+                console.error('Write error:', error);
+            }
+        }
+
+        async function testRead() {
+            try {
+                if (!database) {
+                    await testConnection();
+                }
+                
+                addStatus('Testing read operation...', 'info');
+                
+                const snapshot = await database.ref('test').once('value');
+                const data = snapshot.val();
+                
+                if (data) {
+                    addStatus('✅ Read operation successful!', 'success');
+                    document.getElementById('test-data').textContent = JSON.stringify(data, null, 2);
+                } else {
+                    addStatus('📭 No data found in test path', 'info');
+                    document.getElementById('test-data').textContent = 'No data found';
+                }
+                
+            } catch (error) {
+                addStatus(`❌ Read failed: ${error.message}`, 'error');
+                console.error('Read error:', error);
+            }
+        }
+
+        // Auto-test connection when page loads
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                addStatus('Page loaded. Testing Firebase connection...', 'info');
+                testConnection();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

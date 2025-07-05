@@ -1,10 +1,89 @@
 // Admin Panel JavaScript
 let currentData = JSON.parse(JSON.stringify(websiteData)); // Deep copy of original data
 
+// Firebase configuration (same as main site)
+const firebaseConfig = {
+  apiKey: "AIzaSyAr1jsAaqTk1ZlffhQ85pLLCj34ZXqt2s4",
+  authDomain: "heng-thida-db.firebaseapp.com",
+  databaseURL: "https://heng-thida-db-default-rtdb.firebaseio.com/",
+  projectId: "heng-thida-db",
+  storageBucket: "heng-thida-db.firebasestorage.app",
+  messagingSenderId: "850113003119",
+  appId: "1:850113003119:web:d6f64500987bf0b076979a"
+};
+
+// Initialize Firebase for admin panel
+function initializeAdminFirebase() {
+  try {
+    if (typeof firebase === 'undefined') {
+      console.error('Firebase SDK not loaded. Please include Firebase scripts.');
+      return false;
+    }
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    
+    console.log('Admin Firebase initialized successfully');
+    return true;
+  } catch (error) {
+    console.error('Error initializing Firebase:', error);
+    return false;
+  }
+}
+
+// Load data from Firebase
+async function loadDataFromFirebase() {
+  try {
+    const database = firebase.database();
+    const snapshot = await database.ref('websiteData').once('value');
+    const firebaseData = snapshot.val();
+    
+    if (firebaseData) {
+      currentData = firebaseData;
+      console.log('Data loaded from Firebase');
+      showStatus('Data loaded from Firebase successfully!', 'success');
+    } else {
+      console.log('No data in Firebase, using default data');
+      showStatus('Using default data - no Firebase data found', 'info');
+    }
+    
+    populateAllForms();
+  } catch (error) {
+    console.error('Error loading data from Firebase:', error);
+    showStatus('Error loading data from Firebase: ' + error.message, 'error');
+    populateAllForms(); // Still populate with default data
+  }
+}
+
+// Save data to Firebase
+async function saveDataToFirebase() {
+  try {
+    const database = firebase.database();
+    await database.ref('websiteData').set(currentData);
+    console.log('Data saved to Firebase successfully');
+    showStatus('Data saved to Firebase successfully!', 'success');
+    return true;
+  } catch (error) {
+    console.error('Error saving data to Firebase:', error);
+    showStatus('Error saving to Firebase: ' + error.message, 'error');
+    return false;
+  }
+}
+
 // Initialize admin panel
 document.addEventListener('DOMContentLoaded', function() {
-    loadDataFromStorage();
-    populateAllForms();
+    // Initialize Firebase first
+    setTimeout(() => {
+        const firebaseInitialized = initializeAdminFirebase();
+        if (firebaseInitialized) {
+            loadDataFromFirebase();
+        } else {
+            loadDataFromStorage();
+            populateAllForms();
+        }
+    }, 1000);
+    
     setupEventListeners();
 });
 
@@ -385,12 +464,12 @@ function saveAllData() {
     currentData.theme.accentColor = document.getElementById('accent-color').value;
     
     // Save to localStorage
-    if (saveDataToStorage()) {
-        showStatus('All changes saved successfully!', 'success');
-        
-        // Also update the data.js file content for the main website
-        updateDataFile();
-    }
+    saveDataToStorage();
+    
+    // Save to Firebase
+    saveDataToFirebase();
+    
+    showStatus('All changes saved successfully!', 'success');
 }
 
 function updateDataFile() {

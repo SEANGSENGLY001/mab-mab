@@ -380,6 +380,13 @@ function updateGalleryFromData() {
             </div>
         `;
         galleryItem.insertBefore(img, galleryItem.firstChild);
+        galleryItem.addEventListener('click', () => {
+            // Save gallery interaction to Firebase
+            if (typeof FirebaseDB !== 'undefined') {
+                FirebaseDB.saveGalleryInteraction(index, item.caption);
+            }
+        });
+
         galleryGrid.appendChild(galleryItem);
     });
 }
@@ -426,6 +433,12 @@ function setupSurprises() {
 
         card.addEventListener('click', () => {
             card.classList.add('revealed');
+            
+            // Save surprise reveal to Firebase
+            if (typeof FirebaseDB !== 'undefined') {
+                FirebaseDB.saveSurpriseReveal(index, surprise.title);
+            }
+            
             // Add celebration effect
             createCelebrationEffect(card);
         });
@@ -545,6 +558,11 @@ function showQuizResult() {
     
     scoreElement.textContent = `${quizScore}/${totalQuestions}`;
     quizResult.classList.add('show');
+    
+    // Save quiz result to Firebase
+    if (typeof FirebaseDB !== 'undefined') {
+        FirebaseDB.saveQuizResult(quizScore, totalQuestions);
+    }
     
     // Hide all questions
     document.querySelectorAll('.quiz-question').forEach(q => {
