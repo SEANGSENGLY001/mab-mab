@@ -581,7 +581,7 @@ function showQuizResult() {
 }
 
 // Restart quiz
-function restartQuiz() {
+async function restartQuiz() {
     currentQuizQuestion = 0;
     quizScore = 0;
     
@@ -593,6 +593,21 @@ function restartQuiz() {
     const progressBar = document.querySelector('.quiz-progress');
     progressBar.style.display = 'block';
     
+    // Update quiz with latest data from database
+    if (typeof FirebaseDB !== 'undefined') {
+        try {
+            const latestData = await FirebaseDB.getQuizData();
+            if (latestData && latestData.questions) {
+                siteData.quiz.questions = latestData.questions;
+                setupQuiz(); // Reinitialize quiz with new data
+                return; // Exit since setupQuiz handles everything else
+            }
+        } catch (error) {
+            console.error('Error loading quiz data:', error);
+        }
+    }
+    
+    // Fallback if no database or error occurs
     // Reset all questions - only show the first one
     document.querySelectorAll('.quiz-question').forEach((q, index) => {
         q.classList.remove('active');
