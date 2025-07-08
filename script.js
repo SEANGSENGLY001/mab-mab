@@ -17,11 +17,20 @@ let isUserInteracted = false;
 
 // DOM Content Loaded
 document.addEventListener('DOMContentLoaded', async function() {
+    // Initialize loading screen
+    initializeLoadingScreen();
+    
     // Wait for Firebase to initialize
     await waitForFirebase();
     await loadWebsiteData();
     initializeWebsite();
     startDataRefreshInterval();
+    
+    // Wait for music to load before hiding loading screen
+    await waitForMusicToLoad();
+    
+    // Hide loading screen
+    hideLoadingScreen();
     
     // Auto scroll to music section on page reload
     setTimeout(() => {
@@ -1304,9 +1313,9 @@ function initializeMusicPlayer() {
         return;
     }
     
-    // Set initial volume
-    backgroundMusic.volume = 0.7;
-    volumeSlider.value = 70;
+    // Set initial volume to 25%
+    backgroundMusic.volume = 0.25;
+    volumeSlider.value = 25;
     
     // Add event listeners
     playPauseBtn.addEventListener('click', togglePlayPause);
@@ -1613,6 +1622,77 @@ musicStyle.textContent = `
     }
 `;
 document.head.appendChild(musicStyle);
+
+// Loading Screen Functions
+function initializeLoadingScreen() {
+    console.log('Initializing loading screen...');
+    const loadingScreen = document.getElementById('loading-screen');
+    if (loadingScreen) {
+        loadingScreen.style.display = 'flex';
+        loadingScreen.classList.remove('fade-out');
+    }
+}
+
+function waitForMusicToLoad() {
+    return new Promise((resolve) => {
+        console.log('Waiting for music to load...');
+        
+        if (!backgroundMusic) {
+            console.log('No background music found, resolving immediately');
+            resolve();
+            return;
+        }
+        
+        // Check if music is already loaded
+        if (backgroundMusic.readyState >= 3) { // HAVE_FUTURE_DATA or HAVE_ENOUGH_DATA
+            console.log('Music already loaded');
+            resolve();
+            return;
+        }
+        
+        // Set up timeout to prevent infinite loading
+        const timeout = setTimeout(() => {
+            console.log('Music loading timeout reached');
+            resolve();
+        }, 10000); // 10 second timeout
+        
+        // Listen for the music to be loaded
+        const onCanPlayThrough = () => {
+            console.log('Music can play through');
+            clearTimeout(timeout);
+            backgroundMusic.removeEventListener('canplaythrough', onCanPlayThrough);
+            backgroundMusic.removeEventListener('error', onError);
+            resolve();
+        };
+        
+        const onError = () => {
+            console.log('Music loading error');
+            clearTimeout(timeout);
+            backgroundMusic.removeEventListener('canplaythrough', onCanPlayThrough);
+            backgroundMusic.removeEventListener('error', onError);
+            resolve(); // Resolve anyway to not block the loading
+        };
+        
+        backgroundMusic.addEventListener('canplaythrough', onCanPlayThrough);
+        backgroundMusic.addEventListener('error', onError);
+        
+        // Force load the audio
+        backgroundMusic.load();
+    });
+}
+
+function hideLoadingScreen() {
+    console.log('Hiding loading screen...');
+    const loadingScreen = document.getElementById('loading-screen');
+    if (loadingScreen) {
+        loadingScreen.classList.add('fade-out');
+        
+        // Remove the loading screen after fade animation completes
+        setTimeout(() => {
+            loadingScreen.style.display = 'none';
+        }, 500);
+    }
+}
 
 // Export functions for global access
 window.togglePlayPause = togglePlayPause;
