@@ -10,10 +10,34 @@ const CACHE_MAX_AGE = 5 * 60 * 1000; // 5 minutes in milliseconds
 
 // DOM Content Loaded
 document.addEventListener('DOMContentLoaded', async function() {
+    // Wait for Firebase to initialize
+    await waitForFirebase();
     await loadWebsiteData();
     initializeWebsite();
     startDataRefreshInterval();
 });
+
+// Wait for Firebase to be ready
+function waitForFirebase() {
+    return new Promise((resolve) => {
+        const checkFirebase = () => {
+            if (typeof firebase !== 'undefined' && typeof initializeFirebase === 'function') {
+                // Initialize Firebase
+                const initialized = initializeFirebase();
+                if (initialized && typeof FirebaseDB !== 'undefined') {
+                    // Increment visitor count once Firebase is ready
+                    FirebaseDB.incrementVisitorCount().catch(err => console.log('Visitor count increment failed:', err));
+                    resolve();
+                } else {
+                    setTimeout(checkFirebase, 100);
+                }
+            } else {
+                setTimeout(checkFirebase, 100);
+            }
+        };
+        checkFirebase();
+    });
+}
 
 // Load website data with cache management
 async function loadWebsiteData() {
@@ -27,13 +51,57 @@ async function loadWebsiteData() {
         }
 
         // Fetch fresh data from Firebase
+        console.log('Attempting to fetch fresh data from Firebase...');
         await fetchAndUpdateData();
     } catch (error) {
         console.error('Error loading website data:', error);
+        
+        // Try to get data from Firebase one more time without cache
+        try {
+            if (typeof FirebaseDB !== 'undefined') {
+                console.log('Attempting direct Firebase load...');
+                const firebaseData = await FirebaseDB.loadWebsiteData();
+                if (firebaseData) {
+                    siteData = firebaseData;
+                    console.log('Successfully loaded data directly from Firebase');
+                    
+                    // Update cache with fresh data
+                    localStorage.setItem(CACHE_DATA_KEY, JSON.stringify(firebaseData));
+                    localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());
+                    return;
+                }
+            }
+        } catch (firebaseError) {
+            console.error('Direct Firebase load also failed:', firebaseError);
+        }
+        
         // Fallback to local data if available
-        if (websiteData) {
+        if (typeof websiteData !== 'undefined' && websiteData) {
             siteData = websiteData;
             console.log('Using local fallback data');
+            
+            // Try to save local data to Firebase for future use
+            try {
+                if (typeof FirebaseDB !== 'undefined') {
+                    await FirebaseDB.saveWebsiteData(websiteData);
+                    console.log('Saved local data to Firebase as backup');
+                }
+            } catch (saveError) {
+                console.error('Failed to save local data to Firebase:', saveError);
+            }
+        } else {
+            console.error('No fallback data available');
+            // Create a minimal fallback
+            siteData = {
+                personal: { websiteTitle: 'Birthday Website', girlfriendName: 'Beautiful', specialEventDate: '2024-08-15' },
+                hero: { greeting: 'Happy Birthday', subtitle: 'Loading...', primaryButtonText: 'Start', secondaryButtonText: 'Message' },
+                message: { title: 'Message', content: 'Loading...' },
+                gallery: [],
+                timeline: [],
+                countdown: { title: 'Countdown', subtitle: '' },
+                surprises: [],
+                quiz: { title: 'Quiz', subtitle: '', questions: [], completionMessage: { title: '', message: '' } }
+            };
         }
     }
 }
@@ -41,7 +109,6 @@ async function loadWebsiteData() {
 // Check and retrieve cached data if valid
 async function getCachedData() {
     const lastUpdate = localStorage.getItem(CACHE_TIMESTAMP_KEY);
-    const cachedVersion = localStorage.getItem(CACHE_VERSION_KEY);
     const cachedData = localStorage.getItem(CACHE_DATA_KEY);
     
     if (!lastUpdate || !cachedData) return null;
@@ -52,13 +119,9 @@ async function getCachedData() {
     
     if (isCacheFresh) {
         try {
-            // Get current version from Firebase
-            const currentVersion = await FirebaseDB.getDataVersion();
-            if (currentVersion === cachedVersion) {
-                return JSON.parse(cachedData);
-            }
+            return JSON.parse(cachedData);
         } catch (error) {
-            console.error('Error checking data version:', error);
+            console.error('Error parsing cached data:', error);
         }
     }
     
@@ -71,9 +134,12 @@ async function fetchAndUpdateData() {
         throw new Error('Firebase DB not available');
     }
     
+    console.log('Attempting to fetch data from Firebase...');
+    
     // Fetch fresh data
-    const freshData = await FirebaseDB.getAllData();
-    const currentVersion = await FirebaseDB.getDataVersion();
+    const freshData = await FirebaseDB.loadWebsiteData();
+    
+    console.log('Data received from Firebase:', freshData);
     
     if (!freshData) {
         throw new Error('No data received from Firebase');
@@ -81,16 +147,18 @@ async function fetchAndUpdateData() {
     
     // Update cache
     localStorage.setItem(CACHE_DATA_KEY, JSON.stringify(freshData));
-    localStorage.setItem(CACHE_VERSION_KEY, currentVersion);
     localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());
     
     siteData = freshData;
     console.log('Data updated from Firebase');
     
-    // Update UI if website is already initialized
-    if (document.getElementById('page-title')) {
-        updateContentFromData();
-    }
+    // Always update UI when new data arrives
+    setTimeout(() => {
+        if (document.querySelector('#hero-greeting')) {
+            console.log('Updating UI with new data...');
+            updateContentFromData();
+        }
+    }, 100); // Small delay to ensure DOM is ready
 }
 
 // Start periodic data refresh
@@ -104,6 +172,48 @@ function startDataRefreshInterval() {
         }
     }, CACHE_MAX_AGE);
 }
+
+// Manual refresh function for debugging
+window.refreshWebsiteData = async function() {
+    console.log('Manually refreshing website data...');
+    try {
+        // Clear cache first to force fresh data
+        localStorage.removeItem(CACHE_DATA_KEY);
+        localStorage.removeItem(CACHE_TIMESTAMP_KEY);
+        
+        await fetchAndUpdateData();
+        console.log('Manual refresh completed successfully');
+    } catch (error) {
+        console.error('Manual refresh failed:', error);
+    }
+};
+
+// Clear cache function for debugging
+window.clearDataCache = function() {
+    localStorage.removeItem(CACHE_DATA_KEY);
+    localStorage.removeItem(CACHE_TIMESTAMP_KEY);
+    console.log('Data cache cleared');
+};
+
+// Force data reload without cache
+window.forceDataReload = async function() {
+    console.log('Forcing complete data reload...');
+    try {
+        // Clear cache
+        localStorage.removeItem(CACHE_DATA_KEY);
+        localStorage.removeItem(CACHE_TIMESTAMP_KEY);
+        
+        // Reload data
+        await loadWebsiteData();
+        
+        // Update UI
+        updateContentFromData();
+        
+        console.log('Force reload completed successfully');
+    } catch (error) {
+        console.error('Force reload failed:', error);
+    }
+};
 
 // Initialize all website features
 function initializeWebsite() {
@@ -122,7 +232,7 @@ function initializeWebsite() {
 // Update all content from data
 function updateContentFromData() {
     // Update page title
-    document.getElementById('page-title').textContent = siteData.personal.websiteTitle;
+    document.title = siteData.personal.websiteTitle;
 
     // Update hero section
     document.getElementById('hero-greeting').textContent = siteData.hero.greeting;
@@ -138,6 +248,12 @@ function updateContentFromData() {
     // Update gallery
     updateGalleryFromData();
 
+    // Update timeline
+    setupTimeline();
+
+    // Update surprises
+    setupSurprises();
+
     // Update countdown section
     document.getElementById('countdown-title').textContent = siteData.countdown.title;
     document.getElementById('countdown-subtitle').textContent = siteData.countdown.subtitle;
@@ -145,6 +261,9 @@ function updateContentFromData() {
     // Update quiz section
     document.getElementById('quiz-title-display').textContent = siteData.quiz.title;
     document.getElementById('quiz-subtitle-display').textContent = siteData.quiz.subtitle;
+    setupQuiz();
+
+    console.log('Content updated from data');
 }
 
 // Navigation functionality
