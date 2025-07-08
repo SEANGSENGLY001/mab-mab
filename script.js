@@ -8,6 +8,13 @@ const CACHE_DATA_KEY = 'birthdayWebsiteData';
 const CACHE_TIMESTAMP_KEY = 'birthdayWebsiteLastUpdate';
 const CACHE_MAX_AGE = 5 * 60 * 1000; // 5 minutes in milliseconds
 
+// Music player variables
+let backgroundMusic = null;
+let isPlaying = false;
+let currentTime = 0;
+let duration = 0;
+let isUserInteracted = false;
+
 // DOM Content Loaded
 document.addEventListener('DOMContentLoaded', async function() {
     // Wait for Firebase to initialize
@@ -227,6 +234,7 @@ function initializeWebsite() {
     setupQuiz();
     startCountdown();
     setupScrollAnimations();
+    initializeMusicPlayer();
 }
 
 // Update all content from data
@@ -1260,3 +1268,344 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
 });
+
+// Music Player Functionality
+function initializeMusicPlayer() {
+    console.log('Initializing music player...');
+    
+    // Get audio element
+    backgroundMusic = document.getElementById('backgroundMusic');
+    if (!backgroundMusic) {
+        console.error('Background music element not found!');
+        return;
+    }
+    
+    // Get music player elements
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const volumeSlider = document.getElementById('volumeSlider');
+    const progressSlider = document.getElementById('progressSlider');
+    const currentTimeSpan = document.getElementById('currentTime');
+    const durationSpan = document.getElementById('duration');
+    const musicPlayer = document.querySelector('.music-player');
+    
+    if (!playPauseBtn || !volumeSlider || !progressSlider || !currentTimeSpan || !durationSpan || !musicPlayer) {
+        console.error('Music player elements not found!');
+        return;
+    }
+    
+    // Set initial volume
+    backgroundMusic.volume = 0.7;
+    volumeSlider.value = 70;
+    
+    // Add event listeners
+    playPauseBtn.addEventListener('click', togglePlayPause);
+    volumeSlider.addEventListener('input', changeVolume);
+    progressSlider.addEventListener('input', seekMusic);
+    
+    // Audio event listeners
+    backgroundMusic.addEventListener('loadedmetadata', updateDuration);
+    backgroundMusic.addEventListener('timeupdate', updateProgress);
+    backgroundMusic.addEventListener('ended', onMusicEnded);
+    backgroundMusic.addEventListener('play', onMusicPlay);
+    backgroundMusic.addEventListener('pause', onMusicPause);
+    backgroundMusic.addEventListener('error', onMusicError);
+    
+    // User interaction detection for autoplay
+    document.addEventListener('click', enableAutoPlay, { once: true });
+    document.addEventListener('touchstart', enableAutoPlay, { once: true });
+    document.addEventListener('keydown', enableAutoPlay, { once: true });
+    
+    console.log('Music player initialized successfully');
+}
+
+function enableAutoPlay() {
+    console.log('User interaction detected, enabling autoplay...');
+    isUserInteracted = true;
+    
+    // Try to start playing music automatically
+    if (backgroundMusic && !isPlaying) {
+        playMusic();
+    }
+}
+
+function togglePlayPause() {
+    if (!backgroundMusic) return;
+    
+    if (isPlaying) {
+        pauseMusic();
+    } else {
+        playMusic();
+    }
+}
+
+function playMusic() {
+    if (!backgroundMusic) return;
+    
+    const playPromise = backgroundMusic.play();
+    
+    if (playPromise !== undefined) {
+        playPromise.then(() => {
+            console.log('Music started playing');
+            isPlaying = true;
+            updatePlayPauseButton();
+            updateVisualizerState();
+        }).catch(error => {
+            console.error('Error playing music:', error);
+            // Handle autoplay restrictions
+            if (error.name === 'NotAllowedError') {
+                console.log('Autoplay was prevented by browser. Waiting for user interaction.');
+            }
+        });
+    }
+}
+
+function pauseMusic() {
+    if (!backgroundMusic) return;
+    
+    backgroundMusic.pause();
+    isPlaying = false;
+    updatePlayPauseButton();
+    updateVisualizerState();
+    console.log('Music paused');
+}
+
+function changeVolume(event) {
+    if (!backgroundMusic) return;
+    
+    const volume = event.target.value / 100;
+    backgroundMusic.volume = volume;
+    console.log('Volume changed to:', volume);
+}
+
+function seekMusic(event) {
+    if (!backgroundMusic) return;
+    
+    const seekTime = (event.target.value / 100) * backgroundMusic.duration;
+    backgroundMusic.currentTime = seekTime;
+    console.log('Seeked to:', seekTime);
+}
+
+function updateDuration() {
+    if (!backgroundMusic) return;
+    
+    duration = backgroundMusic.duration;
+    const durationSpan = document.getElementById('duration');
+    if (durationSpan) {
+        durationSpan.textContent = formatTime(duration);
+    }
+    console.log('Duration updated:', duration);
+}
+
+function updateProgress() {
+    if (!backgroundMusic) return;
+    
+    currentTime = backgroundMusic.currentTime;
+    const progressSlider = document.getElementById('progressSlider');
+    const currentTimeSpan = document.getElementById('currentTime');
+    
+    if (progressSlider && duration > 0) {
+        const progress = (currentTime / duration) * 100;
+        progressSlider.value = progress;
+    }
+    
+    if (currentTimeSpan) {
+        currentTimeSpan.textContent = formatTime(currentTime);
+    }
+}
+
+function updatePlayPauseButton() {
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    if (!playPauseBtn) return;
+    
+    const icon = playPauseBtn.querySelector('i');
+    if (icon) {
+        if (isPlaying) {
+            icon.className = 'fas fa-pause';
+        } else {
+            icon.className = 'fas fa-play';
+        }
+    }
+}
+
+function updateVisualizerState() {
+    const musicPlayer = document.querySelector('.music-player');
+    if (!musicPlayer) return;
+    
+    if (isPlaying) {
+        musicPlayer.classList.add('playing');
+        musicPlayer.classList.remove('paused');
+    } else {
+        musicPlayer.classList.add('paused');
+        musicPlayer.classList.remove('playing');
+    }
+}
+
+function onMusicEnded() {
+    console.log('Music ended, restarting...');
+    isPlaying = false;
+    updatePlayPauseButton();
+    updateVisualizerState();
+    
+    // Restart the music for continuous loop
+    if (backgroundMusic) {
+        backgroundMusic.currentTime = 0;
+        if (isUserInteracted) {
+            playMusic();
+        }
+    }
+}
+
+function onMusicPlay() {
+    console.log('Music play event triggered');
+    isPlaying = true;
+    updatePlayPauseButton();
+    updateVisualizerState();
+}
+
+function onMusicPause() {
+    console.log('Music pause event triggered');
+    isPlaying = false;
+    updatePlayPauseButton();
+    updateVisualizerState();
+}
+
+function onMusicError(event) {
+    console.error('Music error:', event);
+    const error = backgroundMusic.error;
+    if (error) {
+        console.error('Error code:', error.code);
+        console.error('Error message:', error.message);
+        
+        // Show user-friendly error message
+        const musicPlayer = document.querySelector('.music-player');
+        if (musicPlayer) {
+            const errorMsg = document.createElement('div');
+            errorMsg.style.cssText = `
+                background: rgba(255, 69, 58, 0.1);
+                border: 1px solid rgba(255, 69, 58, 0.3);
+                border-radius: 10px;
+                padding: 1rem;
+                margin-top: 1rem;
+                color: #ff453a;
+                text-align: center;
+                font-size: 0.9rem;
+            `;
+            errorMsg.innerHTML = '🎵 Unable to load the music file. Please check your connection.';
+            musicPlayer.appendChild(errorMsg);
+        }
+    }
+}
+
+function formatTime(seconds) {
+    if (isNaN(seconds) || seconds === 0) return '0:00';
+    
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+}
+
+// Keyboard shortcuts for music player
+document.addEventListener('keydown', function(event) {
+    // Space bar to play/pause (only if not in an input field)
+    if (event.code === 'Space' && !event.target.matches('input, textarea, select')) {
+        event.preventDefault();
+        togglePlayPause();
+    }
+    
+    // Arrow keys for volume control
+    if (event.code === 'ArrowUp' && event.ctrlKey) {
+        event.preventDefault();
+        const volumeSlider = document.getElementById('volumeSlider');
+        if (volumeSlider) {
+            const newVolume = Math.min(100, parseInt(volumeSlider.value) + 10);
+            volumeSlider.value = newVolume;
+            changeVolume({ target: { value: newVolume } });
+        }
+    }
+    
+    if (event.code === 'ArrowDown' && event.ctrlKey) {
+        event.preventDefault();
+        const volumeSlider = document.getElementById('volumeSlider');
+        if (volumeSlider) {
+            const newVolume = Math.max(0, parseInt(volumeSlider.value) - 10);
+            volumeSlider.value = newVolume;
+            changeVolume({ target: { value: newVolume } });
+        }
+    }
+});
+
+// Add visual feedback for music interaction
+function addMusicInteractionEffects() {
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    if (playPauseBtn) {
+        playPauseBtn.addEventListener('click', function() {
+            // Add ripple effect
+            const ripple = document.createElement('div');
+            ripple.style.cssText = `
+                position: absolute;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.3);
+                transform: scale(0);
+                animation: ripple 0.6s linear;
+                pointer-events: none;
+            `;
+            
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = (rect.width / 2 - size / 2) + 'px';
+            ripple.style.top = (rect.height / 2 - size / 2) + 'px';
+            
+            this.style.position = 'relative';
+            this.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    }
+}
+
+// Initialize music interaction effects
+document.addEventListener('DOMContentLoaded', function() {
+    addMusicInteractionEffects();
+});
+
+// Add ripple animation CSS
+const musicStyle = document.createElement('style');
+musicStyle.textContent = `
+    @keyframes ripple {
+        to {
+            transform: scale(2);
+            opacity: 0;
+        }
+    }
+    
+    /* Music player hover effects */
+    .music-controls button:hover {
+        transform: scale(1.05);
+    }
+    
+    .music-controls input[type="range"]:hover {
+        cursor: pointer;
+    }
+    
+    /* Enhanced visualizer animations when playing */
+    .music-player.playing .visualizer-bar {
+        animation-play-state: running;
+    }
+    
+    .music-player.paused .visualizer-bar {
+        animation-play-state: paused;
+        height: 5px;
+        opacity: 0.5;
+    }
+`;
+document.head.appendChild(musicStyle);
+
+// Export functions for global access
+window.togglePlayPause = togglePlayPause;
+window.playMusic = playMusic;
+window.pauseMusic = pauseMusic;
+
+console.log('Music player script loaded successfully');
