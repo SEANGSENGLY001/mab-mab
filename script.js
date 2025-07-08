@@ -22,6 +22,17 @@ document.addEventListener('DOMContentLoaded', async function() {
     await loadWebsiteData();
     initializeWebsite();
     startDataRefreshInterval();
+    
+    // Auto scroll to music section on page reload
+    setTimeout(() => {
+        const musicSection = document.getElementById('music');
+        if (musicSection) {
+            musicSection.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    }, 500); // Small delay to ensure page is fully loaded
 });
 
 // Wait for Firebase to be ready

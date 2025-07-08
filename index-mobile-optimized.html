@@ -213,6 +213,7 @@
                 <li><a href="#timeline">Our Story</a></li>
                 <li><a href="#countdown">Countdown</a></li>
                 <li><a href="#surprises">Surprises</a></li>
+                <li><a href="#music">Music</a></li>
                 <li><a href="#quiz">Quiz</a></li>
             </ul>
             <div class="hamburger">
@@ -346,6 +347,52 @@
         </div>
     </section>
 
+    <!-- Music Section -->
+    <section id="music" class="music-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Our Special Song</h2>
+                <p>The melody that brings back all our beautiful memories</p>
+            </div>
+            <div class="music-player">
+                <div class="music-info">
+                    <div class="song-title">My Little Star</div>
+                    <div class="artist-name">Manith</div>
+                    <div class="music-description">This song always reminds me of you and all our wonderful moments together 💕</div>
+                </div>
+                <div class="music-controls">
+                    <button id="playPauseBtn" class="music-btn play-pause-btn">
+                        <i class="fas fa-pause"></i>
+                    </button>
+                    <div class="volume-control">
+                        <i class="fas fa-volume-down"></i>
+                        <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="70">
+                        <i class="fas fa-volume-up"></i>
+                    </div>
+                </div>
+                <div class="music-progress">
+                    <div class="time-display">
+                        <span id="currentTime">0:00</span>
+                        <span id="duration">0:00</span>
+                    </div>
+                    <div class="progress-container">
+                        <input type="range" id="progressSlider" class="progress-slider" min="0" max="100" value="0">
+                    </div>
+                </div>
+                <div class="music-visualizer">
+                    <div class="visualizer-bar"></div>
+                    <div class="visualizer-bar"></div>
+                    <div class="visualizer-bar"></div>
+                    <div class="visualizer-bar"></div>
+                    <div class="visualizer-bar"></div>
+                    <div class="visualizer-bar"></div>
+                    <div class="visualizer-bar"></div>
+                    <div class="visualizer-bar"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Quiz Section -->
     <section id="quiz" class="quiz-section">
         <div class="container">
@@ -399,6 +446,12 @@
             document.head.appendChild(script);
         }
     </script>
+
+    <!-- Background Music Audio Element -->
+    <audio id="backgroundMusic" preload="auto" loop>
+        <source src="yt1z.net - Manith - My Little Star (Official Audio) (320 KBps).mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
 
     <!-- Main Script - Optimized version -->
     <script src="script-mobile-optimized.js"></script>

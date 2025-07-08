@@ -61,6 +61,17 @@ document.addEventListener('DOMContentLoaded', async function() {
         
         // Start background tasks
         startBackgroundTasks();
+        
+        // Auto scroll to music section on page reload
+        setTimeout(() => {
+            const musicSection = document.getElementById('music');
+            if (musicSection) {
+                musicSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }, 500); // Small delay to ensure page is fully loaded
     } catch (error) {
         console.error('Error initializing website:', error);
         hideLoadingState();
