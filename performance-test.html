@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Comparison Test</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .version {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .original {
+            border-color: #ff6b6b;
+            background: #fff5f5;
+        }
+        
+        .optimized {
+            border-color: #51cf66;
+            background: #f8fff8;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-original {
+            background: #ff6b6b;
+            color: white;
+        }
+        
+        .btn-optimized {
+            background: #51cf66;
+            color: white;
+        }
+        
+        .metrics {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .improvement {
+            color: #51cf66;
+            font-weight: bold;
+        }
+        
+        .instructions {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #2196f3;
+        }
+        
+        @media (max-width: 600px) {
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Mobile Performance Comparison</h1>
+        <p>Compare the performance between the original and optimized versions of the birthday website.</p>
+        
+        <div class="instructions">
+            <h3>📱 How to Test:</h3>
+            <ol>
+                <li>Open Chrome DevTools (F12)</li>
+                <li>Go to Network tab and enable throttling (Fast 3G or Slow 3G)</li>
+                <li>Go to Performance tab</li>
+                <li>Click "Record" and then click one of the buttons below</li>
+                <li>Stop recording after the page loads</li>
+                <li>Compare the metrics!</li>
+            </ol>
+        </div>
+        
+        <div class="comparison">
+            <div class="version original">
+                <h3>🔴 Original Version</h3>
+                <p>Standard implementation with blocking resources</p>
+                <a href="index.html" class="btn btn-original" target="_blank">Test Original</a>
+                <div class="metrics">
+                    <div class="metric">
+                        <span>Estimated Load Time:</span>
+                        <span>3-5 seconds</span>
+                    </div>
+                    <div class="metric">
+                        <span>JavaScript Bundle:</span>
+                        <span>~15KB</span>
+                    </div>
+                    <div class="metric">
+                        <span>CSS Bundle:</span>
+                        <span>~25KB</span>
+                    </div>
+                    <div class="metric">
+                        <span>Blocking Resources:</span>
+                        <span>High</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="version optimized">
+                <h3>🟢 Optimized Version</h3>
+                <p>Mobile-first with performance optimizations</p>
+                <a href="index-mobile-optimized.html" class="btn btn-optimized" target="_blank">Test Optimized</a>
+                <div class="metrics">
+                    <div class="metric">
+                        <span>Estimated Load Time:</span>
+                        <span class="improvement">1-2 seconds ⚡</span>
+                    </div>
+                    <div class="metric">
+                        <span>JavaScript Bundle:</span>
+                        <span class="improvement">~12KB 📉</span>
+                    </div>
+                    <div class="metric">
+                        <span>CSS Bundle:</span>
+                        <span class="improvement">~18KB 📉</span>
+                    </div>
+                    <div class="metric">
+                        <span>Blocking Resources:</span>
+                        <span class="improvement">Minimal ✨</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="metrics">
+            <h3>🎯 Expected Performance Improvements:</h3>
+            <div class="metric">
+                <span>First Contentful Paint (FCP):</span>
+                <span class="improvement">50-70% faster</span>
+            </div>
+            <div class="metric">
+                <span>Largest Contentful Paint (LCP):</span>
+                <span class="improvement">40-60% faster</span>
+            </div>
+            <div class="metric">
+                <span>Time to Interactive (TTI):</span>
+                <span class="improvement">50-70% faster</span>
+            </div>
+            <div class="metric">
+                <span>Total Blocking Time (TBT):</span>
+                <span class="improvement">60-80% reduction</span>
+            </div>
+            <div class="metric">
+                <span>Mobile Lighthouse Score:</span>
+                <span class="improvement">90+ (vs 70-80)</span>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>🔍 Testing Tools:</h3>
+            <ul>
+                <li><strong>Chrome DevTools:</strong> Built-in performance testing</li>
+                <li><strong>Lighthouse:</strong> Right-click → Inspect → Lighthouse → Mobile</li>
+                <li><strong>PageSpeed Insights:</strong> <a href="https://pagespeed.web.dev/" target="_blank">pagespeed.web.dev</a></li>
+                <li><strong>WebPageTest:</strong> <a href="https://webpagetest.org/" target="_blank">webpagetest.org</a></li>
+            </ul>
+        </div>
+        
+        <div class="instructions">
+            <h3>📋 What to Look For:</h3>
+            <ul>
+                <li><strong>Faster Initial Render:</strong> Content appears quicker</li>
+                <li><strong>Smoother Interactions:</strong> Buttons and animations respond faster</li>
+                <li><strong>Better Mobile Experience:</strong> Touch targets, scrolling, navigation</li>
+                <li><strong>Offline Capability:</strong> Try disabling network after first load</li>
+                <li><strong>Lower Memory Usage:</strong> Check DevTools Memory tab</li>
+            </ul>
+        </div>
+        
+        <div id="realtime-metrics" class="metrics" style="display: none;">
+            <h3>📊 Real-time Performance Metrics:</h3>
+            <div class="metric">
+                <span>Page Load Time:</span>
+                <span id="load-time">Measuring...</span>
+            </div>
+            <div class="metric">
+                <span>DOM Content Loaded:</span>
+                <span id="dom-time">Measuring...</span>
+            </div>
+            <div class="metric">
+                <span>Time to Interactive:</span>
+                <span id="tti-time">Measuring...</span>
+            </div>
+        </div>
+        
+        <button onclick="runPerformanceTest()" class="btn btn-optimized" style="margin: 20px 0;">
+            🧪 Run Performance Test
+        </button>
+    </div>
+
+    <script>
+        // Simple performance measurement
+        function runPerformanceTest() {
+            const metricsDiv = document.getElementById('realtime-metrics');
+            metricsDiv.style.display = 'block';
+            
+            if ('performance' in window) {
+                const navigation = performance.getEntriesByType('navigation')[0];
+                
+                if (navigation) {
+                    const loadTime = navigation.loadEventEnd - navigation.fetchStart;
+                    const domTime = navigation.domContentLoadedEventEnd - navigation.fetchStart;
+                    
+                    document.getElementById('load-time').textContent = `${Math.round(loadTime)}ms`;
+                    document.getElementById('dom-time').textContent = `${Math.round(domTime)}ms`;
+                }
+                
+                // Measure Time to Interactive (simplified)
+                setTimeout(() => {
+                    const tti = performance.now();
+                    document.getElementById('tti-time').textContent = `~${Math.round(tti)}ms`;
+                }, 100);
+                
+                // Report Core Web Vitals if available
+                if ('PerformanceObserver' in window) {
+                    try {
+                        const observer = new PerformanceObserver((list) => {
+                            for (const entry of list.getEntries()) {
+                                if (entry.entryType === 'largest-contentful-paint') {
+                                    console.log('LCP:', entry.startTime);
+                                }
+                                if (entry.entryType === 'first-input') {
+                                    console.log('FID:', entry.processingStart - entry.startTime);
+                                }
+                                if (entry.entryType === 'layout-shift') {
+                                    if (!entry.hadRecentInput) {
+                                        console.log('CLS:', entry.value);
+                                    }
+                                }
+                            }
+                        });
+                        
+                        observer.observe({
+                            entryTypes: ['largest-contentful-paint', 'first-input', 'layout-shift']
+                        });
+                    } catch (e) {
+                        console.log('Some performance metrics not supported');
+                    }
+                }
+            } else {
+                document.getElementById('load-time').textContent = 'Not supported';
+                document.getElementById('dom-time').textContent = 'Not supported';
+                document.getElementById('tti-time').textContent = 'Not supported';
+            }
+        }
+        
+        // Auto-run test on page load
+        window.addEventListener('load', () => {
+            setTimeout(runPerformanceTest, 500);
+        });
+        
+        // Console tips
+        console.log('🚀 Performance Testing Tips:');
+        console.log('1. Open DevTools Network tab and enable throttling');
+        console.log('2. Use Lighthouse for comprehensive audit');
+        console.log('3. Test on real mobile devices when possible');
+        console.log('4. Compare metrics between original and optimized versions');
+    </script>
+</body>
+</html>

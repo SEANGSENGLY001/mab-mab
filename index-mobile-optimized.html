@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title id="page-title">Happy Birthday, Beautiful! 💕</title>
+    <meta name="description" content="A special birthday surprise website">
+    
+    <!-- Performance and mobile optimizations -->
+    <meta name="theme-color" content="#ff69b4">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no">
+    
+    <!-- Preconnect to external domains for faster loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://www.gstatic.com">
+    
+    <!-- Critical CSS inline for faster initial render -->
+    <style>
+        /* Critical above-the-fold styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            -webkit-text-size-adjust: 100%;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', 'Roboto', sans-serif;
+            background: #0a0a0f;
+            color: #ffffff;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+        
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 105, 180, 0.2);
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 16px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .nav-logo {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #ff69b4;
+        }
+        
+        .hero {
+            height: 100vh;
+            min-height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0f0f23, #16213e, #0f3460);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-content {
+            text-align: center;
+            color: #e0e0e0;
+            z-index: 2;
+            position: relative;
+            padding: 0 20px;
+            max-width: 90%;
+        }
+        
+        .hero-title {
+            font-size: clamp(2rem, 8vw, 4rem);
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .greeting {
+            display: block;
+            font-weight: 300;
+            font-size: clamp(1.4rem, 6vw, 2.5rem);
+            margin-bottom: 0.5rem;
+        }
+        
+        .name {
+            display: block;
+            font-weight: 700;
+            font-size: clamp(2.8rem, 10vw, 5rem);
+            background: linear-gradient(135deg, #ffd700, #ff69b4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-subtitle {
+            font-size: clamp(1rem, 4vw, 1.2rem);
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            line-height: 1.5;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 50px;
+            font-size: clamp(0.9rem, 3vw, 1rem);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-height: 44px;
+            min-width: 140px;
+        }
+        
+        .btn-primary {
+            background: #e0e0e0;
+            color: #ff69b4;
+            box-shadow: 0 10px 30px rgba(255, 105, 180, 0.2);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: #e0e0e0;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 10px;
+            min-width: 44px;
+            min-height: 44px;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: #ff69b4;
+            margin: 3px 0;
+            transition: 0.2s ease;
+            border-radius: 2px;
+        }
+    </style>
+    
+    <!-- Load optimized CSS asynchronously -->
+    <link rel="preload" href="styles-mobile-optimized.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="styles-mobile-optimized.css"></noscript>
+    
+    <!-- Load fonts asynchronously with font-display swap for better performance -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
+    
+    <!-- Load Font Awesome asynchronously -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+
+    <!-- Preload critical scripts -->
+    <link rel="preload" href="data.js" as="script">
+    <link rel="preload" href="script-mobile-optimized.js" as="script">
+    
+    <!-- Service Worker for caching (optional) -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(() => {
+                    // Silently fail if service worker registration fails
+                });
+            });
+        }
+    </script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">💕 Birthday Surprise</div>
+            <ul class="nav-menu">
+                <li><a href="#hero">Home</a></li>
+                <li><a href="#message">Message</a></li>
+                <li><a href="#gallery">Memories</a></li>
+                <li><a href="#timeline">Our Story</a></li>
+                <li><a href="#countdown">Countdown</a></li>
+                <li><a href="#surprises">Surprises</a></li>
+                <li><a href="#quiz">Quiz</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero" class="hero">
+        <div class="hero-background">
+            <div class="floating-hearts"></div>
+        </div>
+        <div class="hero-content">
+            <h1 class="hero-title">
+                <span class="greeting" id="hero-greeting">Happy Birthday</span>
+                <span class="name" id="hero-name">Beautiful!</span>
+            </h1>
+            <p class="hero-subtitle" id="hero-subtitle">Today is all about celebrating the most amazing person in my life</p>
+            <div class="hero-buttons">
+                <button class="btn btn-primary" onclick="startSurprise()">
+                    <i class="fas fa-gift" aria-hidden="true"></i> <span id="hero-btn-primary">Start the Surprise</span>
+                </button>
+                <button class="btn btn-secondary" onclick="scrollToMessage()">
+                    <i class="fas fa-heart" aria-hidden="true"></i> <span id="hero-btn-secondary">Read My Message</span>
+                </button>
+            </div>
+        </div>
+        <div class="scroll-indicator" aria-label="Scroll to next section">
+            <i class="fas fa-chevron-down" aria-hidden="true"></i>
+        </div>
+    </section>
+
+    <!-- Personal Message Section -->
+    <section id="message" class="message-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 id="message-title">A Message From My Heart</h2>
+                <div class="heart-divider" aria-hidden="true">💕</div>
+            </div>
+            <div class="message-content">
+                <div class="message-card">
+                    <p class="message-text" id="message-content">
+                        My dearest love,<br><br>
+
+                        Today marks another year of your incredible journey, and I feel so blessed to be part of it.
+                        You bring light to every room you enter, joy to every moment we share, and love to every corner of my heart.
+                        <br><br>
+
+                        This website is my small way of celebrating you and all the beautiful memories we've created together.
+                        Every photo, every moment, every surprise here represents just a fraction of how much you mean to me.
+                        <br><br>
+
+                        Happy Birthday, my love. Here's to many more adventures together! 💕
+                        <br><br>
+
+                        With all my love,<br>
+                        <em>Your devoted partner</em>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Photo Gallery Section -->
+    <section id="gallery" class="gallery-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Our Beautiful Memories</h2>
+                <p>Every picture tells a story of our love</p>
+            </div>
+            <div class="gallery-grid" role="grid">
+                <!-- Photos will be dynamically loaded from data.js -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Timeline Section -->
+    <section id="timeline" class="timeline-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Our Love Story Timeline</h2>
+                <p>The journey of us</p>
+            </div>
+            <div class="timeline" role="list">
+                <!-- Timeline items will be added here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Countdown Section -->
+    <section id="countdown" class="countdown-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 id="countdown-title">Countdown to Something Special</h2>
+                <p id="countdown-subtitle">The excitement is building...</p>
+            </div>
+            <div class="countdown-timer" role="timer" aria-live="polite">
+                <div class="time-unit">
+                    <span class="time-number" id="days" aria-label="Days">00</span>
+                    <span class="time-label">Days</span>
+                </div>
+                <div class="time-unit">
+                    <span class="time-number" id="hours" aria-label="Hours">00</span>
+                    <span class="time-label">Hours</span>
+                </div>
+                <div class="time-unit">
+                    <span class="time-number" id="minutes" aria-label="Minutes">00</span>
+                    <span class="time-label">Minutes</span>
+                </div>
+                <div class="time-unit">
+                    <span class="time-number" id="seconds" aria-label="Seconds">00</span>
+                    <span class="time-label">Seconds</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Surprises Section -->
+    <section id="surprises" class="surprises-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Digital Surprises</h2>
+                <p>Tap each gift to reveal your surprises!</p>
+            </div>
+            <div class="surprises-grid" role="grid">
+                <!-- Surprise cards will be added here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Quiz Section -->
+    <section id="quiz" class="quiz-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 id="quiz-title-display">How Well Do You Know Us?</h2>
+                <p id="quiz-subtitle-display">A fun little quiz about our relationship</p>
+            </div>
+            <div class="quiz-container" role="application" aria-label="Relationship quiz">
+                <!-- Quiz will be added here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Made with 💕 for the most amazing person in the world</p>
+        </div>
+    </footer>
+
+    <!-- Lightbox Modal (Simplified for mobile) -->
+    <div id="lightbox-modal" class="lightbox-modal" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="lightbox-content">
+            <button class="lightbox-close" onclick="closeLightbox()" aria-label="Close image viewer">&times;</button>
+            <button class="lightbox-prev" onclick="navigateLightbox(-1)" aria-label="Previous image">&#10094;</button>
+            <button class="lightbox-next" onclick="navigateLightbox(1)" aria-label="Next image">&#10095;</button>
+            <img id="lightbox-image" class="lightbox-image" alt="">
+            <div class="lightbox-info">
+                <div id="lightbox-caption" class="lightbox-caption"></div>
+                <div id="lightbox-counter" class="lightbox-counter"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts loaded asynchronously for better performance -->
+    
+    <!-- Firebase SDK - Load only if needed -->
+    <script async src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script async src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <!-- Data Configuration -->
+    <script src="data.js"></script>
+    
+    <!-- Firebase Configuration - Load conditionally -->
+    <script>
+        // Only load Firebase config if Firebase is available
+        if (typeof firebase !== 'undefined') {
+            const script = document.createElement('script');
+            script.src = 'firebase-config.js';
+            script.async = true;
+            document.head.appendChild(script);
+        }
+    </script>
+
+    <!-- Main Script - Optimized version -->
+    <script src="script-mobile-optimized.js"></script>
+
+    <!-- Performance monitoring (optional) -->
+    <script>
+        // Simple performance monitoring
+        window.addEventListener('load', () => {
+            if ('performance' in window) {
+                const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+                console.log(`Page load time: ${loadTime}ms`);
+                
+                // Report to analytics if available
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'timing_complete', {
+                        name: 'load',
+                        value: loadTime
+                    });
+                }
+            }
+        });
+        
+        // Report Core Web Vitals
+        if ('PerformanceObserver' in window) {
+            const observer = new PerformanceObserver((list) => {
+                for (const entry of list.getEntries()) {
+                    if (entry.entryType === 'largest-contentful-paint') {
+                        console.log('LCP:', entry.startTime);
+                    }
+                    if (entry.entryType === 'first-input') {
+                        console.log('FID:', entry.processingStart - entry.startTime);
+                    }
+                    if (entry.entryType === 'layout-shift') {
+                        if (!entry.hadRecentInput) {
+                            console.log('CLS:', entry.value);
+                        }
+                    }
+                }
+            });
+            
+            try {
+                observer.observe({entryTypes: ['largest-contentful-paint', 'first-input', 'layout-shift']});
+            } catch (e) {
+                // Silently fail if observer types are not supported
+            }
+        }
+    </script>
+</body>
+</html>

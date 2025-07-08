@@ -1259,34 +1259,4 @@ document.addEventListener('DOMContentLoaded', function() {
         modal.addEventListener('touchend', handleLightboxTouchEnd, { passive: true });
     }
     
-    // Debug function to test lightbox
-    window.testLightbox = function() {
-        console.log('Testing lightbox...');
-        console.log('siteData:', siteData);
-        console.log('Gallery items:', siteData ? siteData.gallery.length : 'No data');
-        if (siteData && siteData.gallery.length > 0) {
-            openLightbox(0);
-        } else {
-            console.error('No gallery data available for testing');
-        }
-    };
-    
-    // Add a global test button for debugging
-    const testButton = document.createElement('button');
-    testButton.textContent = 'Test Lightbox';
-    testButton.style.cssText = `
-        position: fixed;
-        top: 10px;
-        right: 10px;
-        z-index: 9999;
-        background: #ff69b4;
-        color: white;
-        border: none;
-        padding: 10px 15px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-weight: bold;
-    `;
-    testButton.onclick = () => testLightbox();
-    document.body.appendChild(testButton);
 });
