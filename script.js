@@ -551,6 +551,7 @@ function updateGalleryFromData() {
         const galleryItem = document.createElement('div');
         galleryItem.className = 'gallery-item';
         galleryItem.setAttribute('data-caption', item.caption);
+        galleryItem.setAttribute('data-index', index);
 
         // Create a fallback image if the original fails
         const img = document.createElement('img');
@@ -582,7 +583,15 @@ function updateGalleryFromData() {
             </div>
         `;
         galleryItem.insertBefore(img, galleryItem.firstChild);
-        galleryItem.addEventListener('click', () => {
+        
+        // Add click event to open image in new tab
+        galleryItem.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('Gallery item clicked, opening image URL for index:', index); // Debug log
+            
+            // Open image in new tab/window
+            window.open(item.image, '_blank');
+            
             // Save gallery interaction to Firebase
             if (typeof FirebaseDB !== 'undefined') {
                 FirebaseDB.saveGalleryInteraction(index, item.caption);
@@ -591,6 +600,8 @@ function updateGalleryFromData() {
 
         galleryGrid.appendChild(galleryItem);
     });
+    
+    console.log('Gallery updated with', siteData.gallery.length, 'items'); // Debug log
 }
 
 // Setup timeline with data
@@ -1097,3 +1108,185 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// Lightbox functionality
+let currentLightboxIndex = 0;
+
+function openLightbox(index) {
+    console.log('openLightbox called with index:', index); // Debug log
+    
+    currentLightboxIndex = index;
+    const modal = document.getElementById('lightbox-modal');
+    const image = document.getElementById('lightbox-image');
+    const caption = document.getElementById('lightbox-caption');
+    const counter = document.getElementById('lightbox-counter');
+    
+    console.log('Modal element:', modal); // Debug log
+    console.log('Image element:', image); // Debug log
+    console.log('Caption element:', caption); // Debug log
+    console.log('Counter element:', counter); // Debug log
+    
+    if (!modal) {
+        console.error('Lightbox modal not found!');
+        return;
+    }
+    
+    if (!image) {
+        console.error('Lightbox image not found!');
+        return;
+    }
+    
+    const galleryItem = siteData.gallery[index];
+    console.log('Gallery item:', galleryItem); // Debug log
+    
+    // Set image source and caption
+    image.src = galleryItem.image;
+    image.alt = galleryItem.caption;
+    
+    if (caption) {
+        caption.textContent = galleryItem.caption;
+    }
+    
+    if (counter) {
+        counter.textContent = `${index + 1} / ${siteData.gallery.length}`;
+    }
+    
+    // Show modal
+    modal.classList.add('active');
+    console.log('Modal classes after adding active:', modal.classList); // Debug log
+    
+    // Prevent body scroll
+    document.body.style.overflow = 'hidden';
+    
+    // Add escape key listener
+    document.addEventListener('keydown', handleLightboxKeyboard);
+    
+    // Add click outside to close
+    modal.addEventListener('click', handleLightboxBackdropClick);
+}
+
+function closeLightbox() {
+    const modal = document.getElementById('lightbox-modal');
+    modal.classList.remove('active');
+    
+    // Restore body scroll
+    document.body.style.overflow = '';
+    
+    // Remove event listeners
+    document.removeEventListener('keydown', handleLightboxKeyboard);
+    modal.removeEventListener('click', handleLightboxBackdropClick);
+}
+
+function navigateLightbox(direction) {
+    const newIndex = currentLightboxIndex + direction;
+    
+    // Handle wrapping around
+    if (newIndex < 0) {
+        currentLightboxIndex = siteData.gallery.length - 1;
+    } else if (newIndex >= siteData.gallery.length) {
+        currentLightboxIndex = 0;
+    } else {
+        currentLightboxIndex = newIndex;
+    }
+    
+    // Update lightbox content
+    const image = document.getElementById('lightbox-image');
+    const caption = document.getElementById('lightbox-caption');
+    const counter = document.getElementById('lightbox-counter');
+    
+    const galleryItem = siteData.gallery[currentLightboxIndex];
+    
+    image.src = galleryItem.image;
+    image.alt = galleryItem.caption;
+    caption.textContent = galleryItem.caption;
+    counter.textContent = `${currentLightboxIndex + 1} / ${siteData.gallery.length}`;
+}
+
+function handleLightboxKeyboard(e) {
+    switch(e.key) {
+        case 'Escape':
+            closeLightbox();
+            break;
+        case 'ArrowLeft':
+            navigateLightbox(-1);
+            break;
+        case 'ArrowRight':
+            navigateLightbox(1);
+            break;
+    }
+}
+
+function handleLightboxBackdropClick(e) {
+    // Close lightbox if clicking on the backdrop (not the content)
+    if (e.target === e.currentTarget) {
+        closeLightbox();
+    }
+}
+
+// Add touch/swipe support for mobile
+let touchStartX = 0;
+let touchEndX = 0;
+
+function handleLightboxTouchStart(e) {
+    touchStartX = e.changedTouches[0].screenX;
+}
+
+function handleLightboxTouchEnd(e) {
+    touchEndX = e.changedTouches[0].screenX;
+    handleLightboxSwipe();
+}
+
+function handleLightboxSwipe() {
+    const swipeThreshold = 50;
+    const diff = touchStartX - touchEndX;
+    
+    if (Math.abs(diff) > swipeThreshold) {
+        if (diff > 0) {
+            // Swipe left - next image
+            navigateLightbox(1);
+        } else {
+            // Swipe right - previous image
+            navigateLightbox(-1);
+        }
+    }
+}
+
+// Add touch event listeners when lightbox opens
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('lightbox-modal');
+    if (modal) {
+        modal.addEventListener('touchstart', handleLightboxTouchStart, { passive: true });
+        modal.addEventListener('touchend', handleLightboxTouchEnd, { passive: true });
+    }
+    
+    // Debug function to test lightbox
+    window.testLightbox = function() {
+        console.log('Testing lightbox...');
+        console.log('siteData:', siteData);
+        console.log('Gallery items:', siteData ? siteData.gallery.length : 'No data');
+        if (siteData && siteData.gallery.length > 0) {
+            openLightbox(0);
+        } else {
+            console.error('No gallery data available for testing');
+        }
+    };
+    
+    // Add a global test button for debugging
+    const testButton = document.createElement('button');
+    testButton.textContent = 'Test Lightbox';
+    testButton.style.cssText = `
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 9999;
+        background: #ff69b4;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+    `;
+    testButton.onclick = () => testLightbox();
+    document.body.appendChild(testButton);
+});

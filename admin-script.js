@@ -35,31 +35,17 @@ function initializeAdminFirebase() {
 // Load data from Firebase
 async function loadDataFromFirebase() {
   try {
-    if (typeof FirebaseDB === 'undefined') {
-      // Fallback to direct Firebase database call
-      const database = firebase.database();
-      const snapshot = await database.ref('websiteData').once('value');
-      const firebaseData = snapshot.val();
-      
-      if (firebaseData) {
-        currentData = firebaseData;
-        console.log('Data loaded from Firebase');
-        showStatus('Data loaded from Firebase successfully!', 'success');
-      } else {
-        console.log('No data in Firebase, using default data');
-        showStatus('Using default data - no Firebase data found', 'info');
-      }
+    const database = firebase.database();
+    const snapshot = await database.ref('websiteData').once('value');
+    const firebaseData = snapshot.val();
+    
+    if (firebaseData) {
+      currentData = firebaseData;
+      console.log('Data loaded from Firebase');
+      showStatus('Data loaded from Firebase successfully!', 'success');
     } else {
-      // Use FirebaseDB helper
-      const firebaseData = await FirebaseDB.loadWebsiteData();
-      if (firebaseData) {
-        currentData = firebaseData;
-        console.log('Data loaded from Firebase');
-        showStatus('Data loaded from Firebase successfully!', 'success');
-      } else {
-        console.log('No data in Firebase, using default data');
-        showStatus('Using default data - no Firebase data found', 'info');
-      }
+      console.log('No data in Firebase, using default data');
+      showStatus('Using default data - no Firebase data found', 'info');
     }
     
     populateAllForms();
@@ -73,14 +59,8 @@ async function loadDataFromFirebase() {
 // Save data to Firebase
 async function saveDataToFirebase() {
   try {
-    if (typeof FirebaseDB === 'undefined') {
-      // Fallback to direct Firebase database call
-      const database = firebase.database();
-      await database.ref('websiteData').set(currentData);
-    } else {
-      // Use FirebaseDB helper
-      await FirebaseDB.saveWebsiteData(currentData);
-    }
+    const database = firebase.database();
+    await database.ref('websiteData').set(currentData);
     console.log('Data saved to Firebase successfully');
     showStatus('Data saved to Firebase successfully!', 'success');
     return true;

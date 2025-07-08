@@ -136,23 +136,6 @@ const FirebaseDB = {
     }
   },
 
-  // Get quiz data (questions and configuration)
-  getQuizData: async function() {
-    try {
-      if (!database) {
-        console.error('Firebase database not initialized');
-        return null;
-      }
-
-      const ref = database.ref('websiteData/quiz');
-      const snapshot = await ref.once('value');
-      return snapshot.val();
-    } catch (error) {
-      console.error('Error getting quiz data:', error);
-      return null;
-    }
-  },
-
   // Save visitor count
   incrementVisitorCount: async function() {
     try {
@@ -266,8 +249,34 @@ const FirebaseDB = {
   }
 };
 
-// Note: Firebase initialization is now handled by script.js to avoid conflicts
-// This ensures proper order of operations and prevents race conditions
+// Auto-initialize Firebase when the script loads
+document.addEventListener('DOMContentLoaded', function() {
+  // Wait a bit for Firebase SDK to load
+  setTimeout(() => {
+    const initialized = initializeFirebase();
+    if (initialized) {
+      // Increment visitor count
+      FirebaseDB.incrementVisitorCount();
+      
+      // Try to load data from Firebase, fall back to local data if not available
+      FirebaseDB.loadWebsiteData().then(firebaseData => {
+        if (firebaseData) {
+          // Use Firebase data if available
+          window.siteData = firebaseData;
+          // Trigger a re-initialization of the website with new data
+          if (typeof updateContentFromData === 'function') {
+            updateContentFromData();
+          }
+        } else {
+          // Save local data to Firebase for first time
+          if (typeof websiteData !== 'undefined') {
+            FirebaseDB.saveWebsiteData(websiteData);
+          }
+        }
+      });
+    }
+  }, 1000);
+});
 
 // Export for use in other files
 if (typeof window !== 'undefined') {

@@ -191,6 +191,20 @@
         </div>
     </footer>
 
+    <!-- Lightbox Modal -->
+    <div id="lightbox-modal" class="lightbox-modal">
+        <div class="lightbox-content">
+            <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+            <button class="lightbox-prev" onclick="navigateLightbox(-1)">&#10094;</button>
+            <button class="lightbox-next" onclick="navigateLightbox(1)">&#10095;</button>
+            <img id="lightbox-image" class="lightbox-image" alt="Gallery Image">
+            <div class="lightbox-info">
+                <div id="lightbox-caption" class="lightbox-caption"></div>
+                <div id="lightbox-counter" class="lightbox-counter"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="script.js"></script>
 </body>
