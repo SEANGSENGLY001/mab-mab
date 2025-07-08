@@ -2,24 +2,107 @@
 let currentQuizQuestion = 0;
 let quizScore = 0;
 let countdownInterval;
-let siteData = websiteData; // Use data from data.js
+let siteData = null;
+const CACHE_VERSION_KEY = 'birthdayWebsiteCacheVersion';
+const CACHE_DATA_KEY = 'birthdayWebsiteData';
+const CACHE_TIMESTAMP_KEY = 'birthdayWebsiteLastUpdate';
+const CACHE_MAX_AGE = 5 * 60 * 1000; // 5 minutes in milliseconds
 
 // DOM Content Loaded
-document.addEventListener('DOMContentLoaded', function() {
-    loadSavedData();
+document.addEventListener('DOMContentLoaded', async function() {
+    await loadWebsiteData();
     initializeWebsite();
+    startDataRefreshInterval();
 });
 
-// Load saved data from localStorage if available
-function loadSavedData() {
-    const savedData = localStorage.getItem('birthdayWebsiteData');
-    if (savedData) {
-        try {
-            siteData = JSON.parse(savedData);
-        } catch (e) {
-            console.error('Error loading saved data:', e);
+// Load website data with cache management
+async function loadWebsiteData() {
+    try {
+        // Check if we should use cached data
+        const cachedData = await getCachedData();
+        if (cachedData) {
+            siteData = cachedData;
+            console.log('Using cached data');
+            return;
+        }
+
+        // Fetch fresh data from Firebase
+        await fetchAndUpdateData();
+    } catch (error) {
+        console.error('Error loading website data:', error);
+        // Fallback to local data if available
+        if (websiteData) {
+            siteData = websiteData;
+            console.log('Using local fallback data');
         }
     }
+}
+
+// Check and retrieve cached data if valid
+async function getCachedData() {
+    const lastUpdate = localStorage.getItem(CACHE_TIMESTAMP_KEY);
+    const cachedVersion = localStorage.getItem(CACHE_VERSION_KEY);
+    const cachedData = localStorage.getItem(CACHE_DATA_KEY);
+    
+    if (!lastUpdate || !cachedData) return null;
+    
+    // Check if cache is still fresh
+    const now = Date.now();
+    const isCacheFresh = (now - parseInt(lastUpdate)) < CACHE_MAX_AGE;
+    
+    if (isCacheFresh) {
+        try {
+            // Get current version from Firebase
+            const currentVersion = await FirebaseDB.getDataVersion();
+            if (currentVersion === cachedVersion) {
+                return JSON.parse(cachedData);
+            }
+        } catch (error) {
+            console.error('Error checking data version:', error);
+        }
+    }
+    
+    return null;
+}
+
+// Fetch fresh data from Firebase and update cache
+async function fetchAndUpdateData() {
+    if (typeof FirebaseDB === 'undefined') {
+        throw new Error('Firebase DB not available');
+    }
+    
+    // Fetch fresh data
+    const freshData = await FirebaseDB.getAllData();
+    const currentVersion = await FirebaseDB.getDataVersion();
+    
+    if (!freshData) {
+        throw new Error('No data received from Firebase');
+    }
+    
+    // Update cache
+    localStorage.setItem(CACHE_DATA_KEY, JSON.stringify(freshData));
+    localStorage.setItem(CACHE_VERSION_KEY, currentVersion);
+    localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());
+    
+    siteData = freshData;
+    console.log('Data updated from Firebase');
+    
+    // Update UI if website is already initialized
+    if (document.getElementById('page-title')) {
+        updateContentFromData();
+    }
+}
+
+// Start periodic data refresh
+function startDataRefreshInterval() {
+    // Check for updates every 5 minutes
+    setInterval(async () => {
+        try {
+            await fetchAndUpdateData();
+        } catch (error) {
+            console.error('Error refreshing data:', error);
+        }
+    }, CACHE_MAX_AGE);
 }
 
 // Initialize all website features
