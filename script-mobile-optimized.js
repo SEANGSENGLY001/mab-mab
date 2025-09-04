@@ -258,7 +258,7 @@ function startDataRefreshInterval() {
     }, refreshInterval);
 }
 
-// Optimized website initialization
+// Enhanced website initialization with mobile optimizations
 async function initializeWebsite() {
     if (!siteData) {
         console.error('No site data available');
@@ -268,11 +268,19 @@ async function initializeWebsite() {
     // Update content first (most important)
     updateContentFromData();
     
+    // Initialize mobile optimizations
+    initializeMobileOptimizations();
+    
+    // Start performance monitoring
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        monitorPerformance();
+    }
+    
     // Initialize features progressively
     await initializeFeatures();
 }
 
-// Progressive feature initialization
+// Enhanced progressive feature initialization with performance monitoring
 async function initializeFeatures() {
     const features = [
         () => setupTimeline(),
@@ -282,16 +290,40 @@ async function initializeFeatures() {
         () => setupScrollAnimations()
     ];
 
-    // Initialize features with small delays to prevent blocking
+    // Initialize features with performance monitoring
+    const startTime = performance.now();
+    
     for (let i = 0; i < features.length; i++) {
         try {
+            const featureStartTime = performance.now();
             features[i]();
-            // Small delay between features to prevent blocking
+            const featureEndTime = performance.now();
+            
+            console.log(`Feature ${i + 1} initialized in ${featureEndTime - featureStartTime}ms`);
+            
+            // Adaptive delay based on device performance
+            const delay = (featureEndTime - featureStartTime) > 50 ? 100 : 50;
+            
             if (i < features.length - 1) {
-                await new Promise(resolve => setTimeout(resolve, 50));
+                await new Promise(resolve => setTimeout(resolve, delay));
             }
         } catch (error) {
             console.error(`Error initializing feature ${i}:`, error);
+        }
+    }
+    
+    const totalTime = performance.now() - startTime;
+    console.log(`All features initialized in ${totalTime}ms`);
+    
+    // Report performance metrics
+    if ('performance' in window && 'getEntriesByType' in performance) {
+        const navigationEntry = performance.getEntriesByType('navigation')[0];
+        if (navigationEntry) {
+            console.log('Page load performance:', {
+                domContentLoaded: navigationEntry.domContentLoadedEventEnd - navigationEntry.domContentLoadedEventStart,
+                loadComplete: navigationEntry.loadEventEnd - navigationEntry.loadEventStart,
+                totalTime: navigationEntry.loadEventEnd - navigationEntry.fetchStart
+            });
         }
     }
 }
@@ -350,54 +382,104 @@ function updateElement(selector, content, isHTML = false) {
     }
 }
 
-// Optimized navigation setup
+// Enhanced navigation setup with smooth scrolling
 function setupNavigation() {
     const hamburger = document.querySelector('.hamburger');
     const navMenu = document.querySelector('.nav-menu');
     
     if (!hamburger || !navMenu) return;
 
-    // Hamburger menu toggle
+    // Hamburger menu toggle with improved accessibility
     hamburger.addEventListener('click', () => {
-        hamburger.classList.toggle('active');
+        const isActive = hamburger.classList.toggle('active');
         navMenu.classList.toggle('active');
         
+        // Update ARIA attributes for accessibility
+        hamburger.setAttribute('aria-expanded', isActive);
+        
         // Prevent body scroll when menu is open
-        document.body.style.overflow = navMenu.classList.contains('active') ? 'hidden' : '';
+        document.body.style.overflow = isActive ? 'hidden' : '';
+        
+        // Focus management
+        if (isActive) {
+            const firstLink = navMenu.querySelector('a');
+            if (firstLink) firstLink.focus();
+        }
     });
 
-    // Close menu when clicking links
+    // Enhanced menu interaction handling
     navMenu.addEventListener('click', (e) => {
         if (e.target.tagName === 'A') {
             hamburger.classList.remove('active');
             navMenu.classList.remove('active');
+            hamburger.setAttribute('aria-expanded', 'false');
             document.body.style.overflow = '';
         }
     });
 
-    // Close menu when clicking outside
+    // Close menu when clicking outside with improved detection
     document.addEventListener('click', (e) => {
-        if (!hamburger.contains(e.target) && !navMenu.contains(e.target)) {
+        if (!hamburger.contains(e.target) && !navMenu.contains(e.target) && navMenu.classList.contains('active')) {
             hamburger.classList.remove('active');
             navMenu.classList.remove('active');
+            hamburger.setAttribute('aria-expanded', 'false');
             document.body.style.overflow = '';
         }
     });
 
-    // Smooth scrolling for navigation links
+    // Enhanced keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && navMenu.classList.contains('active')) {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+            hamburger.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
+            hamburger.focus();
+        }
+    });
+
+    // Enhanced smooth scrolling for navigation links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
             const targetId = this.getAttribute('href');
             const target = document.querySelector(targetId);
+            
             if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
+                // Calculate offset for mobile navbar
+                const navbarHeight = document.querySelector('.navbar')?.offsetHeight || 70;
+                const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - navbarHeight;
+                
+                // Use optimized smooth scrolling for mobile
+                smoothScrollToPosition(targetPosition);
             }
         });
     });
+}
+
+// Optimized smooth scrolling function for mobile
+function smoothScrollToPosition(targetY, duration = 600) {
+    const startY = window.pageYOffset;
+    const distance = targetY - startY;
+    const startTime = performance.now();
+    
+    function easeInOutQuad(t) {
+        return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+    }
+    
+    function animation(currentTime) {
+        const timeElapsed = currentTime - startTime;
+        const progress = Math.min(timeElapsed / duration, 1);
+        const ease = easeInOutQuad(progress);
+        
+        window.scrollTo(0, startY + (distance * ease));
+        
+        if (progress < 1) {
+            requestAnimationFrame(animation);
+        }
+    }
+    
+    requestAnimationFrame(animation);
 }
 
 // Basic scroll setup (lightweight)
@@ -793,9 +875,14 @@ function restartQuiz() {
     }, 100);
 }
 
-// Countdown timer (optimized)
-function startCountdown() {
+// Enhanced countdown timer with power saving support
+function startCountdown(updateInterval = 1000) {
     if (!siteData.personal.specialEventDate) return;
+    
+    // Clear existing interval
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+    }
     
     const targetDate = new Date(siteData.personal.specialEventDate);
     
@@ -824,48 +911,60 @@ function startCountdown() {
     };
     
     updateCountdown(); // Initial update
-    countdownInterval = setInterval(updateCountdown, 1000);
+    countdownInterval = setInterval(updateCountdown, updateInterval);
 }
 
-// Hero section functions
+// Enhanced hero section functions with optimized mobile scrolling
 function startSurprise() {
-    // Simple scroll to message
+    // Simple scroll to message on mobile for better performance
     const messageSection = document.getElementById('message');
     if (messageSection) {
-        messageSection.scrollIntoView({
-            behavior: 'smooth'
-        });
+        const targetY = messageSection.getBoundingClientRect().top + window.pageYOffset - 70;
+        smoothScrollToPosition(targetY, 600);
     }
 }
 
 function scrollToMessage() {
     const messageSection = document.getElementById('message');
     if (messageSection) {
-        messageSection.scrollIntoView({
-            behavior: 'smooth'
-        });
+        const targetY = messageSection.getBoundingClientRect().top + window.pageYOffset - 70;
+        smoothScrollToPosition(targetY, 600);
     }
 }
 
-// Optimized scroll animations
+// Enhanced optimized scroll animations with reduced complexity for mobile
 function setupScrollAnimations() {
-    // Use more efficient intersection observer
+    // Check if user prefers reduced motion
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    
+    if (prefersReducedMotion) {
+        // Skip animations for users who prefer reduced motion
+        return;
+    }
+    
+    // Use more efficient intersection observer for mobile
     const observerOptions = {
         threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
+        rootMargin: '50px 0px -50px 0px'
     };
     
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-                observer.unobserve(entry.target); // Stop observing once animated
+                const element = entry.target;
+                
+                // Simple fade-in with slight movement
+                element.style.opacity = '1';
+                element.style.transform = 'translateY(0)';
+                element.classList.add('animate-in');
+                
+                // Stop observing once animated to improve performance
+                observer.unobserve(entry.target);
             }
         });
     }, observerOptions);
     
-    // Observe elements for scroll animations
+    // Batch process elements with minimal transforms
     const elementsToAnimate = document.querySelectorAll('.gallery-item, .timeline-item, .surprise-card');
     elementsToAnimate.forEach(el => {
         el.style.opacity = '0';
@@ -873,9 +972,273 @@ function setupScrollAnimations() {
         el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
         observer.observe(el);
     });
+    
+    // Setup mobile-optimized scroll effects
+    setupMobileScrollEffects();
 }
 
-// Cleanup function for when page is hidden
+// Mobile-optimized scroll effects with battery saving
+function setupMobileScrollEffects() {
+    const hero = document.querySelector('.hero');
+    const navbar = document.querySelector('.navbar');
+    
+    if (!hero || !navbar) return;
+    
+    let lastScrollY = 0;
+    let ticking = false;
+    
+    function updateScrollEffects() {
+        const currentScrollY = window.pageYOffset;
+        const scrollDiff = currentScrollY - lastScrollY;
+        
+        // Simple navbar hide/show on mobile
+        if (Math.abs(scrollDiff) > 10) {
+            if (scrollDiff > 0 && currentScrollY > 100) {
+                // Scrolling down - hide navbar
+                navbar.style.transform = 'translateY(-100%)';
+            } else if (scrollDiff < 0 || currentScrollY <= 50) {
+                // Scrolling up - show navbar
+                navbar.style.transform = 'translateY(0)';
+            }
+        }
+        
+        // Simple hero parallax effect (reduced for mobile performance)
+        if (currentScrollY < hero.offsetHeight) {
+            const progress = currentScrollY / hero.offsetHeight;
+            hero.style.setProperty('--scroll-progress', progress);
+        }
+        
+        lastScrollY = currentScrollY;
+        ticking = false;
+    }
+    
+    // Throttled scroll handler with longer delay for battery saving
+    function handleScroll() {
+        if (!ticking) {
+            // Use longer timeout for mobile to save battery
+            setTimeout(() => {
+                updateScrollEffects();
+            }, 16); // ~60fps
+            ticking = true;
+        }
+    }
+    
+    // Add passive scroll listener
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    // Pause animations when page is hidden to save battery
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+            // Remove scroll listener when page is hidden
+            window.removeEventListener('scroll', handleScroll);
+        } else {
+            // Re-add scroll listener when page becomes visible
+            window.addEventListener('scroll', handleScroll, { passive: true });
+        }
+    });
+}
+
+// Enhanced battery optimization and performance monitoring for mobile
+function initializeMobileOptimizations() {
+    // Detect device capabilities
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isLowPowerMode = 'getBattery' in navigator;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    
+    // Battery API support (experimental)
+    if (isLowPowerMode) {
+        navigator.getBattery().then((battery) => {
+            console.log('Battery level:', Math.round(battery.level * 100) + '%');
+            console.log('Battery charging:', battery.charging);
+            
+            // Optimize performance based on battery level
+            if (battery.level < 0.2 && !battery.charging) {
+                console.log('Low battery detected, enabling power saving mode');
+                enablePowerSavingMode();
+            }
+            
+            // Listen for battery changes
+            battery.addEventListener('levelchange', () => {
+                if (battery.level < 0.2 && !battery.charging) {
+                    enablePowerSavingMode();
+                } else if (battery.level > 0.5 || battery.charging) {
+                    disablePowerSavingMode();
+                }
+            });
+        }).catch(err => {
+            console.log('Battery API not supported');
+        });
+    }
+    
+    // Connection-based optimizations
+    if ('connection' in navigator) {
+        const connection = navigator.connection;
+        console.log('Connection type:', connection.effectiveType);
+        
+        // Optimize for slow connections
+        if (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g') {
+            enableLowBandwidthMode();
+        }
+        
+        // Listen for connection changes
+        connection.addEventListener('change', () => {
+            if (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g') {
+                enableLowBandwidthMode();
+            } else {
+                disableLowBandwidthMode();
+            }
+        });
+    }
+    
+    // Memory optimization
+    if ('memory' in performance) {
+        const memory = performance.memory;
+        console.log('Memory usage:', {
+            used: Math.round(memory.usedJSHeapSize / 1048576) + ' MB',
+            total: Math.round(memory.totalJSHeapSize / 1048576) + ' MB',
+            limit: Math.round(memory.jsHeapSizeLimit / 1048576) + ' MB'
+        });
+        
+        // Enable memory optimizations if usage is high
+        if (memory.usedJSHeapSize / memory.jsHeapSizeLimit > 0.8) {
+            enableMemoryOptimizations();
+        }
+    }
+}
+
+// Power saving mode
+function enablePowerSavingMode() {
+    console.log('Enabling power saving mode');
+    document.body.classList.add('power-saving');
+    
+    // Disable animations
+    const style = document.createElement('style');
+    style.id = 'power-saving-style';
+    style.textContent = `
+        .power-saving * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+        .power-saving .floating-hearts {
+            display: none !important;
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Reduce update frequency
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+        startCountdown(2000); // Update every 2 seconds instead of 1
+    }
+}
+
+function disablePowerSavingMode() {
+    console.log('Disabling power saving mode');
+    document.body.classList.remove('power-saving');
+    
+    const powerSavingStyle = document.getElementById('power-saving-style');
+    if (powerSavingStyle) {
+        powerSavingStyle.remove();
+    }
+    
+    // Restore normal countdown
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+        startCountdown();
+    }
+}
+
+// Low bandwidth mode
+function enableLowBandwidthMode() {
+    console.log('Enabling low bandwidth mode');
+    document.body.classList.add('low-bandwidth');
+    
+    // Hide heavy elements
+    const heavyElements = document.querySelectorAll('.floating-hearts, .confetti-container');
+    heavyElements.forEach(el => {
+        el.style.display = 'none';
+    });
+}
+
+function disableLowBandwidthMode() {
+    console.log('Disabling low bandwidth mode');
+    document.body.classList.remove('low-bandwidth');
+    
+    const heavyElements = document.querySelectorAll('.floating-hearts, .confetti-container');
+    heavyElements.forEach(el => {
+        el.style.display = '';
+    });
+}
+
+// Memory optimizations
+function enableMemoryOptimizations() {
+    console.log('Enabling memory optimizations');
+    
+    // Reduce observer thresholds
+    if (typeof observer !== 'undefined') {
+        observer.disconnect();
+    }
+    
+    // Cleanup unused event listeners
+    const elements = document.querySelectorAll('*');
+    elements.forEach(el => {
+        const clone = el.cloneNode(true);
+        if (el.parentNode) {
+            el.parentNode.replaceChild(clone, el);
+        }
+    });
+}
+
+// Performance monitoring
+function monitorPerformance() {
+    let frameCount = 0;
+    let lastTime = performance.now();
+    
+    function measureFPS() {
+        frameCount++;
+        const currentTime = performance.now();
+        
+        if (currentTime - lastTime >= 1000) {
+            const fps = Math.round((frameCount * 1000) / (currentTime - lastTime));
+            console.log('FPS:', fps);
+            
+            // If FPS is low, enable optimizations
+            if (fps < 30) {
+                enablePerformanceOptimizations();
+            }
+            
+            frameCount = 0;
+            lastTime = currentTime;
+        }
+        
+        requestAnimationFrame(measureFPS);
+    }
+    
+    requestAnimationFrame(measureFPS);
+}
+
+function enablePerformanceOptimizations() {
+    console.log('Enabling performance optimizations');
+    
+    // Reduce animation complexity
+    document.body.classList.add('performance-mode');
+    
+    const style = document.createElement('style');
+    style.id = 'performance-mode-style';
+    style.textContent = `
+        .performance-mode .gallery-item:hover {
+            transform: none !important;
+        }
+        .performance-mode .btn:hover {
+            transform: none !important;
+        }
+        .performance-mode * {
+            will-change: auto !important;
+        }
+    `;
+    document.head.appendChild(style);
+}
 document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') {
         // Clear timers to save battery

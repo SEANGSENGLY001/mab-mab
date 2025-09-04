@@ -30,19 +30,26 @@
     padding: 0;
 }
 
-/* Critical performance optimizations */
+/* Critical performance optimizations with enhanced scroll smoothness */
 html {
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
     scroll-behavior: smooth;
+    scroll-padding-top: 70px; /* Account for mobile navbar */
     scrollbar-width: none;
     -ms-overflow-style: none;
-    /* GPU acceleration */
+    /* Enhanced GPU acceleration for smooth scrolling */
     transform: translateZ(0);
     backface-visibility: hidden;
     perspective: 1000px;
+    /* Momentum scrolling for iOS/Safari */
+    -webkit-overflow-scrolling: touch;
+    /* Prevent bounce/overscroll effects */
+    overscroll-behavior: none;
+    /* Optimize rendering performance */
+    contain: layout style paint;
 }
 
 html::-webkit-scrollbar {
@@ -58,9 +65,17 @@ body {
     overflow-x: hidden;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    /* Performance optimizations */
+    /* Enhanced performance optimizations */
     transform: translateZ(0);
     backface-visibility: hidden;
+    /* Prevent overscroll bounce on mobile */
+    overscroll-behavior: none;
+    /* Smooth font rendering */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeSpeed;
+    /* Better touch handling */
+    touch-action: pan-y;
 }
 
 body::-webkit-scrollbar {
@@ -75,7 +90,7 @@ body::-webkit-scrollbar {
     padding: 0 16px;
 }
 
-/* Mobile-optimized navigation */
+/* Mobile-optimized navigation with enhanced performance */
 .navbar {
     position: fixed;
     top: 0;
@@ -85,9 +100,12 @@ body::-webkit-scrollbar {
     border-bottom: 1px solid rgba(255, 105, 180, 0.2);
     z-index: 1000;
     transition: var(--transition-smooth);
-    /* Performance optimization */
-    will-change: transform;
+    /* Enhanced performance optimization */
+    will-change: transform, background-color;
     transform: translateZ(0);
+    backface-visibility: hidden;
+    /* Better mobile rendering */
+    contain: layout style;
 }
 
 .nav-container {
@@ -189,7 +207,7 @@ body::-webkit-scrollbar {
     transform: scale(1.05);
 }
 
-/* Optimized Hero Section */
+/* Optimized Hero Section with enhanced scroll performance */
 .hero {
     height: 100vh;
     min-height: 600px;
@@ -199,10 +217,14 @@ body::-webkit-scrollbar {
     justify-content: center;
     background: var(--gradient-dark);
     overflow: hidden;
-    /* Performance optimizations */
-    will-change: transform;
+    /* Enhanced performance optimizations */
+    will-change: transform, opacity;
     transform: translateZ(0);
     backface-visibility: hidden;
+    /* Smooth momentum scrolling */
+    -webkit-overflow-scrolling: touch;
+    /* Better rendering performance */
+    contain: layout style paint;
 }
 
 .hero-background {
@@ -213,9 +235,12 @@ body::-webkit-scrollbar {
     height: 100%;
     z-index: 1;
     background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
-    /* Performance optimizations */
+    /* Enhanced performance optimizations */
     will-change: transform;
     transform: translateZ(0);
+    backface-visibility: hidden;
+    /* Better mobile rendering */
+    contain: layout style;
 }
 
 .hero-content {
@@ -225,9 +250,14 @@ body::-webkit-scrollbar {
     position: relative;
     padding: 0 20px;
     max-width: 90%;
-    /* Performance optimizations */
+    /* Enhanced performance optimizations */
     will-change: transform, opacity;
     transform: translateZ(0);
+    backface-visibility: hidden;
+    /* Better text rendering */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    /* Containment for better performance */
+    contain: layout style;
 }
 
 .hero-title {
@@ -279,7 +309,7 @@ body::-webkit-scrollbar {
     transform: translateZ(0);
 }
 
-/* Optimized buttons */
+/* Optimized buttons with enhanced touch feedback */
 .btn {
     padding: 12px 24px;
     border: none;
@@ -296,10 +326,14 @@ body::-webkit-scrollbar {
     /* Touch optimization */
     min-height: 44px;
     min-width: 140px;
-    /* Performance optimizations */
-    will-change: transform, box-shadow;
+    /* Enhanced performance optimizations */
+    will-change: transform, box-shadow, background-color;
     transform: translateZ(0);
     backface-visibility: hidden;
+    /* Better touch handling */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
 }
 
 .btn-primary {
@@ -312,6 +346,11 @@ body::-webkit-scrollbar {
 .btn-primary:active {
     transform: translateY(-2px) scale(1.02);
     box-shadow: var(--shadow-hover);
+}
+
+.btn-primary:focus {
+    outline: 2px solid rgba(255, 105, 180, 0.5);
+    outline-offset: 2px;
 }
 
 .btn-secondary {
@@ -327,7 +366,12 @@ body::-webkit-scrollbar {
     transform: translateY(-2px) scale(1.02);
 }
 
-/* Simplified scroll indicator */
+.btn-secondary:focus {
+    outline: 2px solid rgba(255, 255, 255, 0.5);
+    outline-offset: 2px;
+}
+
+/* Enhanced scroll indicator with better touch support */
 .scroll-indicator {
     position: absolute;
     bottom: 30px;
@@ -336,24 +380,35 @@ body::-webkit-scrollbar {
     color: var(--text-light);
     font-size: 1.5rem;
     cursor: pointer;
-    /* Performance optimizations */
-    will-change: transform;
+    /* Enhanced performance optimizations */
+    will-change: transform, opacity;
     transform: translateZ(0) translateX(-50%);
+    backface-visibility: hidden;
     transition: var(--transition-smooth);
     z-index: 10;
-    /* Touch optimization */
+    /* Enhanced touch optimization */
     padding: 10px;
     min-width: 44px;
     min-height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 50%;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
 }
 
 .scroll-indicator:hover,
 .scroll-indicator:active {
     transform: translateZ(0) translateX(-50%) scale(1.1);
     color: var(--primary-color);
+    background: rgba(255, 105, 180, 0.1);
+}
+
+.scroll-indicator:focus {
+    outline: 2px solid rgba(255, 105, 180, 0.5);
+    outline-offset: 2px;
 }
 
 /* Simplified animations */
@@ -422,10 +477,12 @@ body::-webkit-scrollbar {
     font-style: italic;
 }
 
-/* Gallery Section - Mobile Optimized */
+/* Gallery Section - Mobile Optimized with enhanced performance */
 .gallery-section {
     padding: 3rem 0;
     background: var(--background-light);
+    /* Performance optimization */
+    contain: layout style;
 }
 
 .gallery-grid {
@@ -433,6 +490,8 @@ body::-webkit-scrollbar {
     grid-template-columns: 1fr;
     gap: 1rem;
     margin-top: 2rem;
+    /* Enhanced performance */
+    contain: layout;
 }
 
 .gallery-item {
@@ -442,14 +501,26 @@ body::-webkit-scrollbar {
     box-shadow: var(--shadow-soft);
     transition: var(--transition-smooth);
     cursor: pointer;
-    /* Touch optimization */
+    /* Enhanced touch optimization */
     min-height: 44px;
+    /* Enhanced performance optimizations */
+    will-change: transform, box-shadow;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    /* Better touch handling */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .gallery-item:hover,
 .gallery-item:active {
-    transform: translateY(-5px);
+    transform: translateY(-5px) scale(1.01);
     box-shadow: var(--shadow-hover);
+}
+
+.gallery-item:focus {
+    outline: 2px solid rgba(255, 105, 180, 0.5);
+    outline-offset: 2px;
 }
 
 .gallery-item img {
@@ -1075,16 +1146,76 @@ button:focus, .btn:focus, .quiz-option:focus {
     outline-offset: 2px;
 }
 
-/* Reduce motion for accessibility */
+/* Enhanced Reduce motion for accessibility and battery optimization */
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
     }
     
     html {
         scroll-behavior: auto;
+    }
+    
+    .floating-hearts {
+        display: none;
+    }
+    
+    .hero-background,
+    .hero-content {
+        will-change: auto;
+        transform: none !important;
+    }
+}
+
+/* Battery optimization for mobile devices */
+@media (max-width: 768px) and (pointer: coarse) {
+    /* Reduce GPU usage on mobile */
+    .floating-hearts {
+        display: none;
+    }
+    
+    /* Simplify transforms on mobile */
+    .gallery-item:hover,
+    .gallery-item:active {
+        transform: translateY(-3px);
+    }
+    
+    .btn:hover,
+    .btn:active {
+        transform: translateY(-1px) scale(1.01);
+    }
+    
+    /* Reduce will-change usage to save battery */
+    .hero-content,
+    .hero-background {
+        will-change: auto;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .btn {
+        border: 2px solid currentColor;
+    }
+    
+    .gallery-item,
+    .surprise-card,
+    .timeline-content {
+        border: 1px solid currentColor;
+    }
+}
+
+/* Dark mode optimization (for systems that prefer dark themes) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --text-dark: #ffffff;
+        --text-light: #e0e0e0;
+        --background-dark: #000000;
+        --background-card: #111111;
+        --background-light: #0a0a0a;
     }
 }
 

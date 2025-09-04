@@ -255,6 +255,16 @@ function initializeWebsite() {
     startCountdown();
     setupScrollAnimations();
     initializeMusicPlayer();
+    
+    // Initialize enhanced scrolling features
+    initializeEnhancedScrolling();
+    
+    // Add performance monitoring
+    if ('performance' in window) {
+        window.addEventListener('load', () => {
+            console.log('Website loaded in:', performance.now(), 'ms');
+        });
+    }
 }
 
 // Update all content from data
@@ -915,26 +925,57 @@ function startCountdown() {
     }, 1000);
 }
 
-// Hero section functions
+// Enhanced hero section functions with smooth scrolling
 function startSurprise() {
-    // Create a burst of confetti
+    // Create a burst of confetti with enhanced animation
     const confettiContainer = document.querySelector('.confetti-container');
-    for (let i = 0; i < 100; i++) {
-        setTimeout(() => {
-            createConfettiPiece();
-        }, i * 50);
+    if (confettiContainer) {
+        for (let i = 0; i < 100; i++) {
+            setTimeout(() => {
+                createConfettiPiece();
+            }, i * 50);
+        }
     }
     
-    // Scroll to message section
-    document.getElementById('message').scrollIntoView({
-        behavior: 'smooth'
-    });
+    // Enhanced scroll to message section with custom easing
+    const messageSection = document.getElementById('message');
+    if (messageSection) {
+        const targetY = messageSection.getBoundingClientRect().top + window.pageYOffset - 80;
+        smoothScrollTo(targetY, 1000);
+    }
 }
 
 function scrollToMessage() {
-    document.getElementById('message').scrollIntoView({
-        behavior: 'smooth'
-    });
+    const messageSection = document.getElementById('message');
+    if (messageSection) {
+        const targetY = messageSection.getBoundingClientRect().top + window.pageYOffset - 80;
+        smoothScrollTo(targetY, 800);
+    }
+}
+
+// Enhanced smooth scroll function with custom easing
+function smoothScrollTo(targetY, duration = 800) {
+    const startY = window.pageYOffset;
+    const distance = targetY - startY;
+    const startTime = performance.now();
+    
+    function easeInOutCubic(t) {
+        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+    
+    function animation(currentTime) {
+        const timeElapsed = currentTime - startTime;
+        const progress = Math.min(timeElapsed / duration, 1);
+        const ease = easeInOutCubic(progress);
+        
+        window.scrollTo(0, startY + (distance * ease));
+        
+        if (progress < 1) {
+            requestAnimationFrame(animation);
+        }
+    }
+    
+    requestAnimationFrame(animation);
 }
 
 // Create celebration effect for surprise cards
@@ -972,42 +1013,77 @@ function createCelebrationEffect(element) {
     }
 }
 
-// Scroll animations
+// Enhanced scroll animations with advanced Intersection Observer optimizations
 function setupScrollAnimations() {
+    // Enhanced observer options for better performance
     const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
+        threshold: [0, 0.1, 0.25, 0.5, 0.75, 1], // Multiple thresholds for smoother animations
+        rootMargin: '50px 0px -100px 0px', // Start animations earlier, end later
+        passive: true
     };
     
+    // Create intersection observer with performance optimizations
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
+                // Smooth animation with stagger effect
+                const element = entry.target;
+                const delay = parseFloat(element.dataset.animationDelay) || 0;
+                
+                setTimeout(() => {
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0) scale(1)';
+                    element.classList.add('animate-in');
+                    
+                    // Add subtle bounce effect for better user experience
+                    if (element.classList.contains('gallery-item') || element.classList.contains('surprise-card')) {
+                        element.style.transform = 'translateY(0) scale(1.02)';
+                        setTimeout(() => {
+                            element.style.transform = 'translateY(0) scale(1)';
+                        }, 150);
+                    }
+                }, delay);
+                
+                // Stop observing once animated to improve performance
+                observer.unobserve(entry.target);
             }
         });
     }, observerOptions);
     
-    // Observe elements for scroll animations
-    document.querySelectorAll('.gallery-item, .timeline-item, .surprise-card').forEach(el => {
+    // Enhanced batch processing for better performance
+    const elementsToAnimate = document.querySelectorAll('.gallery-item, .timeline-item, .surprise-card, .section-header');
+    
+    elementsToAnimate.forEach((el, index) => {
+        // Set initial state with transform and scale
         el.style.opacity = '0';
-        el.style.transform = 'translateY(30px)';
-        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        el.style.transform = 'translateY(30px) scale(0.95)';
+        el.style.transition = 'opacity 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+        
+        // Add stagger delay data attribute
+        el.dataset.animationDelay = (index * 100).toString(); // 100ms stagger
+        
+        // Observe element
         observer.observe(el);
     });
     
-    // Setup hero section scroll parallax
+    // Setup enhanced hero section scroll parallax
     setupHeroScrollParallax();
+    
+    // Setup scroll-based navbar animation
+    setupNavbarScrollAnimation();
+    
+    // Setup scroll progress indicator
+    setupScrollProgressIndicator();
 }
 
-// Hero section scroll parallax effect with smooth interpolation
+// Enhanced hero section scroll parallax effect with momentum and smooth interpolation
 function setupHeroScrollParallax() {
     const hero = document.querySelector('.hero');
     const scrollIndicator = document.querySelector('.scroll-indicator');
     
     if (!hero) return;
     
-    // Add click event to scroll indicator
+    // Add click event to scroll indicator with smooth scrolling
     if (scrollIndicator) {
         scrollIndicator.addEventListener('click', () => {
             const nextSection = document.querySelector('#message');
@@ -1020,59 +1096,98 @@ function setupHeroScrollParallax() {
         });
     }
     
+    // Enhanced animation variables
     let currentProgress = 0;
     let targetProgress = 0;
     let animationFrameId = null;
+    let lastScrollY = 0;
+    let velocity = 0;
+    let isScrolling = false;
     
+    // Smooth interpolation with momentum easing
     function lerp(start, end, factor) {
         return start + (end - start) * factor;
+    }
+    
+    // Enhanced easing function for more natural movement
+    function easeOutQuart(t) {
+        return 1 - Math.pow(1 - t, 4);
     }
     
     function updateParallax() {
         const scrolled = window.pageYOffset;
         const heroHeight = hero.offsetHeight;
-        targetProgress = Math.min(scrolled / heroHeight, 1);
+        const viewportHeight = window.innerHeight;
         
-        // Smoothly interpolate the scroll progress
+        // Calculate velocity for momentum effect
+        velocity = scrolled - lastScrollY;
+        lastScrollY = scrolled;
+        
+        // Enhanced progress calculation with viewport consideration
+        targetProgress = Math.min(scrolled / (heroHeight * 0.8), 1.2);
+        
+        // Apply momentum to target progress
+        const momentumFactor = Math.abs(velocity) * 0.01;
+        targetProgress += momentumFactor * Math.sign(velocity);
+        targetProgress = Math.max(0, Math.min(targetProgress, 1.5));
+        
+        // Start animation loop if not already running
         if (!animationFrameId) {
             animationFrameId = requestAnimationFrame(animate);
         }
     }
     
     function animate() {
-        // Smooth interpolation between current and target progress
-        currentProgress = lerp(currentProgress, targetProgress, 0.1);
+        // Smooth interpolation with enhanced easing
+        const easingFactor = isScrolling ? 0.15 : 0.08; // Faster during scroll, slower when idle
+        currentProgress = lerp(currentProgress, targetProgress, easingFactor);
         
-        // Update CSS custom property for smooth transitions
-        hero.style.setProperty('--scroll-progress', currentProgress);
+        // Apply easing to the progress for more natural movement
+        const easedProgress = easeOutQuart(Math.min(currentProgress, 1));
         
-        // Add/remove scrolled class based on progress
-        if (currentProgress > 0) {
+        // Update CSS custom property with enhanced progress
+        hero.style.setProperty('--scroll-progress', easedProgress);
+        
+        // Enhanced class management with smooth transitions
+        if (currentProgress > 0.05) {
             hero.classList.add('scrolled');
         } else {
             hero.classList.remove('scrolled');
         }
         
-        // Update scroll indicator visibility
+        // Enhanced scroll indicator visibility with fade effect
         if (scrollIndicator) {
-            if (currentProgress > 0.1) {
+            const indicatorOpacity = Math.max(0, 1 - (currentProgress * 2));
+            const indicatorTransform = `translateX(-50%) translateY(${currentProgress * 20}px)`;
+            
+            scrollIndicator.style.opacity = indicatorOpacity;
+            scrollIndicator.style.transform = indicatorTransform;
+            
+            if (currentProgress > 0.8) {
                 scrollIndicator.classList.add('fade-out');
             } else {
                 scrollIndicator.classList.remove('fade-out');
             }
         }
         
-        // Continue animation if not close enough to target
-        if (Math.abs(currentProgress - targetProgress) > 0.001) {
+        // Continue animation if progress is changing significantly
+        const progressDiff = Math.abs(currentProgress - targetProgress);
+        if (progressDiff > 0.001 || Math.abs(velocity) > 0.1) {
             animationFrameId = requestAnimationFrame(animate);
         } else {
             animationFrameId = null;
+            isScrolling = false;
         }
     }
     
-    // Throttled scroll event listener for better performance
+    // Enhanced throttled scroll event listener with passive mode
     let ticking = false;
-    window.addEventListener('scroll', () => {
+    let scrollTimeout;
+    
+    function handleScroll() {
+        isScrolling = true;
+        clearTimeout(scrollTimeout);
+        
         if (!ticking) {
             requestAnimationFrame(() => {
                 updateParallax();
@@ -1080,20 +1195,177 @@ function setupHeroScrollParallax() {
             });
             ticking = true;
         }
-    }, { passive: true });
+        
+        // Detect when scrolling stops
+        scrollTimeout = setTimeout(() => {
+            isScrolling = false;
+        }, 150);
+    }
     
-    // Update on resize with debouncing
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    // Enhanced resize handler with debouncing
     let resizeTimeout;
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(updateParallax, 100);
-    });
+        resizeTimeout = setTimeout(() => {
+            updateParallax();
+        }, 100);
+    }, { passive: true });
     
     // Initial update
     updateParallax();
 }
 
-// Add CSS animations dynamically
+// Enhanced navbar scroll animation
+function setupNavbarScrollAnimation() {
+    const navbar = document.querySelector('.navbar');
+    if (!navbar) return;
+    
+    let lastScrollY = 0;
+    let isScrollingDown = false;
+    let navbarTimeout;
+    
+    function updateNavbar() {
+        const currentScrollY = window.pageYOffset;
+        const scrollDiff = currentScrollY - lastScrollY;
+        
+        // Determine scroll direction
+        if (scrollDiff > 5 && currentScrollY > 100) {
+            // Scrolling down - hide navbar
+            isScrollingDown = true;
+            navbar.style.transform = 'translateY(-100%)';
+            navbar.style.opacity = '0.9';
+        } else if (scrollDiff < -5 || currentScrollY <= 100) {
+            // Scrolling up or at top - show navbar
+            isScrollingDown = false;
+            navbar.style.transform = 'translateY(0)';
+            navbar.style.opacity = '1';
+        }
+        
+        // Add background blur effect based on scroll position
+        const blurAmount = Math.min(currentScrollY / 100, 1);
+        navbar.style.backdropFilter = `blur(${10 + (blurAmount * 5)}px)`;
+        navbar.style.backgroundColor = `rgba(10, 10, 15, ${0.85 + (blurAmount * 0.15)})`;
+        
+        lastScrollY = currentScrollY;
+    }
+    
+    // Throttled scroll handler
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            requestAnimationFrame(() => {
+                updateNavbar();
+                ticking = false;
+            });
+            ticking = true;
+        }
+    }, { passive: true });
+}
+
+// Enhanced scroll progress indicator
+function setupScrollProgressIndicator() {
+    // Create progress bar element
+    const progressBar = document.createElement('div');
+    progressBar.className = 'scroll-progress-bar';
+    progressBar.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 0%;
+        height: 3px;
+        background: linear-gradient(90deg, #ff69b4, #ff1493, #ffd700);
+        z-index: 10001;
+        transition: width 0.1s ease-out;
+        will-change: width;
+        transform: translateZ(0);
+    `;
+    
+    document.body.appendChild(progressBar);
+    
+    function updateProgress() {
+        const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrollProgress = (scrollTop / scrollHeight) * 100;
+        
+        progressBar.style.width = `${Math.min(scrollProgress, 100)}%`;
+        
+        // Add glow effect when scrolling
+        if (scrollProgress > 0) {
+            progressBar.style.boxShadow = '0 0 10px rgba(255, 105, 180, 0.6)';
+        } else {
+            progressBar.style.boxShadow = 'none';
+        }
+    }
+    
+    // Throttled scroll handler
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            requestAnimationFrame(() => {
+                updateProgress();
+                ticking = false;
+            });
+            ticking = true;
+        }
+    }, { passive: true });
+    
+    // Initial update
+    updateProgress();
+}
+
+// Add enhanced smooth scrolling for all links
+function enhanceSmoothScrolling() {
+    // Enhanced smooth scrolling with easing
+    function smoothScrollTo(targetY, duration = 800) {
+        const startY = window.pageYOffset;
+        const distance = targetY - startY;
+        const startTime = performance.now();
+        
+        function easeInOutCubic(t) {
+            return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        }
+        
+        function animation(currentTime) {
+            const timeElapsed = currentTime - startTime;
+            const progress = Math.min(timeElapsed / duration, 1);
+            const ease = easeInOutCubic(progress);
+            
+            window.scrollTo(0, startY + (distance * ease));
+            
+            if (progress < 1) {
+                requestAnimationFrame(animation);
+            }
+        }
+        
+        requestAnimationFrame(animation);
+    }
+    
+    // Override default smooth scrolling for better control
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const target = document.querySelector(targetId);
+            
+            if (target) {
+                const targetY = target.getBoundingClientRect().top + window.pageYOffset - 80; // Account for navbar
+                smoothScrollTo(targetY);
+            }
+        });
+    });
+}
+
+// Initialize enhanced scrolling features
+function initializeEnhancedScrolling() {
+    // Check if user prefers reduced motion
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    
+    if (!prefersReducedMotion) {
+        enhanceSmoothScrolling();
+    }
+}
 const style = document.createElement('style');
 style.textContent = `
     @keyframes floatUp {

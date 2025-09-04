@@ -125,6 +125,15 @@ html {
     -ms-text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
+    /* Enhanced scroll performance */
+    scroll-behavior: smooth;
+    scroll-padding-top: 80px; /* Account for fixed navbar */
+    /* GPU acceleration for better performance */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+    /* Optimize rendering */
+    contain: layout style paint;
 }
 
 /* Hide scrollbar for all browsers */
@@ -164,6 +173,15 @@ body {
     /* Hide scrollbar for webkit browsers */
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* Internet Explorer 10+ */
+    /* Enhanced scroll performance */
+    overscroll-behavior: none; /* Prevent bounce/refresh on mobile */
+    /* GPU acceleration */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    /* Smoother font rendering */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeSpeed;
 }
 
 /* Hide scrollbar for webkit browsers */
@@ -269,7 +287,7 @@ body::-webkit-scrollbar {
     transform: rotate(45deg) translate(-5px, -6px);
 }
 
-/* Hero Section */
+/* Hero Section - Enhanced Performance */
 .hero {
     height: 100vh;
     position: relative;
@@ -278,32 +296,45 @@ body::-webkit-scrollbar {
     justify-content: center;
     background: var(--gradient-dark);
     overflow: hidden;
-    /* Performance optimizations */
-    will-change: transform;
+    /* Enhanced performance optimizations */
+    will-change: transform, opacity;
     transform: translateZ(0);
+    backface-visibility: hidden;
     /* Custom property for scroll progress */
     --scroll-progress: 0;
-    /* Smooth scrolling interaction */
-    transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    /* Smooth scrolling interaction with momentum */
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                opacity 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    /* Containment for better performance */
+    contain: layout style paint;
+    /* Smooth scrolling momentum */
+    -webkit-overflow-scrolling: touch;
 }
 
-/* Scroll-based parallax effects */
+/* Enhanced scroll-based parallax effects with momentum */
 .hero.scrolled {
-    transform: translate3d(0, 0, 0) 
-               scale(calc(1 + var(--scroll-progress) * 0.015)) 
+    transform: translate3d(0, calc(var(--scroll-progress) * -10px), 0) 
+               scale(calc(1 + var(--scroll-progress) * 0.01)) 
                perspective(1000px)
-               rotateX(calc(var(--scroll-progress) * 0.8deg));
+               rotateX(calc(var(--scroll-progress) * 0.5deg));
+    /* Smoother transition with momentum easing */
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .hero.scrolled .hero-content {
-    transform: translate3d(0, calc(var(--scroll-progress) * -15px), 0)
-               scale(calc(1 - var(--scroll-progress) * 0.02));
-    opacity: calc(1 - var(--scroll-progress) * 0.2);
+    transform: translate3d(0, calc(var(--scroll-progress) * -20px), 0)
+               scale(calc(1 - var(--scroll-progress) * 0.015));
+    opacity: calc(1 - var(--scroll-progress) * 0.15);
+    /* Smooth content fade with momentum */
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1),
+                opacity 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .hero.scrolled .hero-background {
-    transform: translate3d(0, calc(var(--scroll-progress) * 8px), 0)
-               scale(calc(1 + var(--scroll-progress) * 0.03));
+    transform: translate3d(0, calc(var(--scroll-progress) * 12px), 0)
+               scale(calc(1 + var(--scroll-progress) * 0.02));
+    /* Background parallax with momentum */
+    transition: transform 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .hero-background {
@@ -314,10 +345,13 @@ body::-webkit-scrollbar {
     height: 100%;
     z-index: 1;
     background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
-    /* Performance optimizations */
+    /* Enhanced performance optimizations */
     will-change: transform;
     transform: translateZ(0);
-    transition: transform 0.2s ease-out;
+    backface-visibility: hidden;
+    transition: transform 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+    /* Improve rendering performance */
+    contain: layout style;
 }
 
 .hero-content {
@@ -326,10 +360,16 @@ body::-webkit-scrollbar {
     z-index: 2;
     position: relative;
     animation: heroContentEntry 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-    /* Performance optimizations */
+    /* Enhanced performance optimizations */
     will-change: transform, opacity;
     transform: translateZ(0);
-    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    backface-visibility: hidden;
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                opacity 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    /* Improve text rendering */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    /* Containment for better performance */
+    contain: layout style;
 }
 
 .hero-title {
@@ -393,15 +433,20 @@ body::-webkit-scrollbar {
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     text-decoration: none;
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    /* Performance optimizations */
-    will-change: transform, box-shadow;
+    /* Enhanced performance optimizations */
+    will-change: transform, box-shadow, background-color;
     transform: translateZ(0);
     backface-visibility: hidden;
+    /* Smooth hover transitions */
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+    /* Touch optimization */
+    touch-action: manipulation;
 }
 
 .btn-primary {
@@ -410,9 +455,17 @@ body::-webkit-scrollbar {
     box-shadow: var(--shadow-soft);
 }
 
-.btn-primary:hover {
+.btn-primary:hover, .btn-primary:focus {
     transform: translate3d(0, -3px, 0) scale(1.02);
     box-shadow: var(--shadow-hover);
+    /* Enhanced focus state for accessibility */
+    outline: 2px solid rgba(255, 105, 180, 0.5);
+    outline-offset: 2px;
+}
+
+.btn-primary:active {
+    transform: translate3d(0, -1px, 0) scale(1.01);
+    transition-duration: 0.1s;
 }
 
 .btn-secondary {
@@ -421,10 +474,18 @@ body::-webkit-scrollbar {
     border: 2px solid var(--text-light);
 }
 
-.btn-secondary:hover {
+.btn-secondary:hover, .btn-secondary:focus {
     background: var(--text-light);
     color: var(--primary-color);
     transform: translate3d(0, -3px, 0) scale(1.02);
+    /* Enhanced focus state */
+    outline: 2px solid rgba(255, 255, 255, 0.5);
+    outline-offset: 2px;
+}
+
+.btn-secondary:active {
+    transform: translate3d(0, -1px, 0) scale(1.01);
+    transition-duration: 0.1s;
 }
 
 .scroll-indicator {
@@ -436,16 +497,32 @@ body::-webkit-scrollbar {
     font-size: 1.5rem;
     animation: smoothBounce 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
     cursor: pointer;
-    /* Performance optimizations */
-    will-change: transform;
+    /* Enhanced performance optimizations */
+    will-change: transform, opacity;
     transform: translateZ(0) translateX(-50%);
-    transition: all 0.3s ease;
+    backface-visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     z-index: 10;
+    /* Touch optimization */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    /* Better accessibility */
+    outline: none;
+    padding: 10px;
+    border-radius: 50%;
 }
 
-.scroll-indicator:hover {
+.scroll-indicator:hover, .scroll-indicator:focus {
     transform: translateZ(0) translateX(-50%) scale(1.1);
     color: var(--primary-color);
+    background: rgba(255, 105, 180, 0.1);
+    outline: 2px solid rgba(255, 105, 180, 0.3);
+    outline-offset: 2px;
+}
+
+.scroll-indicator:active {
+    transform: translateZ(0) translateX(-50%) scale(1.05);
+    transition-duration: 0.1s;
 }
 
 .scroll-indicator.fade-out {
@@ -638,10 +715,12 @@ body::-webkit-scrollbar {
     }
 }
 
-/* Gallery Section */
+/* Gallery Section - Enhanced Performance */
 .gallery-section {
     padding: 5rem 0;
     background: var(--background-light);
+    /* Performance optimization */
+    contain: layout style;
 }
 
 .gallery-grid {
@@ -649,6 +728,8 @@ body::-webkit-scrollbar {
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
     margin-top: 2rem;
+    /* Enhanced performance */
+    contain: layout;
 }
 
 .gallery-item {
@@ -656,13 +737,25 @@ body::-webkit-scrollbar {
     border-radius: 15px;
     overflow: hidden;
     box-shadow: var(--shadow-soft);
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     cursor: pointer;
+    /* Enhanced performance optimizations */
+    will-change: transform, box-shadow;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    /* Touch optimization */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.gallery-item:hover {
-    transform: translateY(-10px);
+.gallery-item:hover, .gallery-item:focus {
+    transform: translateY(-10px) scale(1.02);
     box-shadow: var(--shadow-hover);
+}
+
+.gallery-item:active {
+    transform: translateY(-5px) scale(1.01);
+    transition-duration: 0.1s;
 }
 
 .gallery-item img {
@@ -2028,22 +2121,30 @@ img {
     user-select: none;
 }
 
-/* Smooth scrolling for all browsers */
+/* Enhanced smooth scrolling for all browsers with momentum */
 html {
     scroll-behavior: smooth;
-    /* GPU acceleration */
+    scroll-padding-top: 80px;
+    /* GPU acceleration for better scroll performance */
     transform: translateZ(0);
     backface-visibility: hidden;
-    perspective: 1000;
+    perspective: 1000px;
+    /* Momentum scrolling on iOS/macOS */
+    -webkit-overflow-scrolling: touch;
+    /* Prevent overscroll effects */
+    overscroll-behavior: none;
 }
 
-/* Performance optimizations for all sections */
+/* Enhanced performance optimizations for all sections */
 .section {
-    will-change: transform;
+    will-change: transform, opacity;
     transform: translateZ(0);
+    backface-visibility: hidden;
+    /* Containment for better performance */
+    contain: layout style;
 }
 
-/* Optimize animations for mobile devices */
+/* Optimize animations for mobile devices with reduced motion support */
 @media (hover: none) and (pointer: coarse) {
     .hero-content,
     .hero-background,
@@ -2054,7 +2155,38 @@ html {
     
     .hero.scrolled .hero-content,
     .hero.scrolled .hero-background {
-        transition: transform 0.2s ease-out;
+        transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+    }
+    
+    /* Reduce animation complexity on mobile */
+    .gallery-item:hover {
+        transform: translateY(-5px) scale(1.01);
+    }
+    
+    .btn:hover, .btn:focus {
+        transform: translate3d(0, -2px, 0) scale(1.01);
+    }
+}
+
+/* Support for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+    
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+    
+    .hero.scrolled,
+    .hero.scrolled .hero-content,
+    .hero.scrolled .hero-background {
+        transform: none !important;
     }
 }
 
