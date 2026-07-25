@@ -1,18 +1,16 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { db, storage, auth } from '../services/firebase';
+import { db, auth } from '../services/firebase';
 import {
   collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc, serverTimestamp,
   query, limit, orderBy,
 } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { signOut } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 
 const TABS = {
   MEMORIES: 'memories',
   LETTER: 'letter',
-  MUSIC: 'music',
   SETTINGS: 'settings',
 };
 
@@ -23,7 +21,6 @@ export default function Admin() {
   // Shared state
   const [memories, setMemories] = useState([]);
   const [letterContent, setLetterContent] = useState('');
-  const [playlist, setPlaylist] = useState([]);
   const [birthdayDate, setBirthdayDate] = useState('');
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
@@ -35,9 +32,6 @@ export default function Admin() {
   // Form state
   const [newMemory, setNewMemory] = useState({ description: '', imageUrl: '', date: '' });
   const [editingMemory, setEditingMemory] = useState(null);
-  const [musicFile, setMusicFile] = useState(null);
-  const [musicTitle, setMusicTitle] = useState('');
-  const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
 
   // Lazily load data per active tab — only attach listeners for the tab in use
@@ -55,15 +49,6 @@ export default function Admin() {
     getDoc(doc(db, 'settings', 'letter')).then((snap) => {
       if (snap.exists()) setLetterContent(snap.data().content || '');
     });
-  }, [activeTab]);
-
-  useEffect(() => {
-    if (activeTab !== TABS.MUSIC) return;
-    const q = query(collection(db, 'music'), limit(50));
-    const unsub = onSnapshot(q, (snap) => {
-      setPlaylist(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-    });
-    return () => unsub();
   }, [activeTab]);
 
   useEffect(() => {
@@ -159,35 +144,6 @@ export default function Admin() {
     }
   };
 
-  // --- Music ---
-  const handleUploadMusic = async () => {
-    if (!musicFile || !musicTitle.trim()) return;
-    setUploading(true);
-    try {
-      const storageRef = ref(storage, `music/${Date.now()}_${musicFile.name}`);
-      await uploadBytes(storageRef, musicFile);
-      const fileUrl = await getDownloadURL(storageRef);
-      await addDoc(collection(db, 'music'), { title: musicTitle, fileUrl });
-      setMusicFile(null);
-      setMusicTitle('');
-      showMessage('success', 'បញ្ចូលតន្ត្រីដោយជោគជ័យ!');
-    } catch (err) {
-      showMessage('error', 'បរាជ័យក្នុងការបញ្ចូលតន្ត្រី');
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const handleDeleteMusic = async (id) => {
-    if (!window.confirm('លុបបទចម្រៀងនេះទេ?')) return;
-    try {
-      await deleteDoc(doc(db, 'music', id));
-      showMessage('success', 'លុបបទចម្រៀងដោយជោគជ័យ!');
-    } catch (err) {
-      showMessage('error', 'បរាជ័យក្នុងការលុប');
-    }
-  };
-
   // --- Messages ---
   const handleAddMessage = async () => {
     if (!newMessage.trim()) return;
@@ -254,7 +210,6 @@ export default function Admin() {
   const tabs = [
     { key: TABS.MEMORIES, label: 'Memories', icon: 'photo_library' },
     { key: TABS.LETTER, label: 'Letter', icon: 'mail' },
-    { key: TABS.MUSIC, label: 'Music', icon: 'music_note' },
     { key: TABS.SETTINGS, label: 'Settings', icon: 'settings' },
   ];
 
@@ -434,58 +389,6 @@ export default function Admin() {
                 <span className="icon">save</span>
                 រក្សាទុក
               </button>
-            </motion.div>
-          )}
-
-          {/* MUSIC TAB */}
-          {activeTab === TABS.MUSIC && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <h2 className="admin-section-title">បញ្ចូលតន្ត្រី</h2>
-              <div className="form-group">
-                <label className="form-label">ចំណងជើងបទ</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={musicTitle}
-                  onChange={(e) => setMusicTitle(e.target.value)}
-                  placeholder="Song title..."
-                />
-              </div>
-              <div className="form-group">
-                <label className="form-label">ឯកសារ MP3</label>
-                <input
-                  type="file"
-                  accept="audio/*"
-                  className="form-file-input"
-                  onChange={(e) => setMusicFile(e.target.files[0])}
-                />
-              </div>
-              <button
-                className="admin-submit-btn"
-                onClick={handleUploadMusic}
-                disabled={uploading || !musicFile || !musicTitle}
-              >
-                <span className="icon">music_note</span>
-                {uploading ? 'កំពុងបញ្ចូល...' : 'បញ្ចូលតន្ត្រី'}
-              </button>
-
-              <h2 className="admin-section-title">បញ្ជីចម្រៀង</h2>
-              <div className="admin-list">
-                {playlist.map((song) => (
-                  <div key={song.id} className="admin-list-item">
-                    <div className="admin-list-info">
-                      <p className="admin-list-desc">{song.title}</p>
-                      <small className="admin-list-date">បានរក្សាទុក</small>
-                    </div>
-                    <div className="admin-list-actions">
-                      <button className="admin-delete-btn" onClick={() => handleDeleteMusic(song.id)}>
-                        <span className="icon">delete</span>
-                      </button>
-                    </div>
-                  </div>
-                ))}
-                {playlist.length === 0 && <p className="admin-empty">មិនទាន់មានតន្ត្រីនៅឡើយទេ</p>}
-              </div>
             </motion.div>
           )}
 
